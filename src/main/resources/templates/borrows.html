@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Взятые книги</title>
+    <link rel="stylesheet" th:href="@{/styles.css}">
+    <style>
+        body { font-family: Arial, sans-serif; }
+        h1 { text-align: center; margin-top: 20px; }
+
+        .btn {
+            padding: 8px 16px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn:hover { background-color: #45a049; }
+
+        .top-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px auto;
+            width: 90%;
+            max-width: 1000px;
+        }
+
+        .search-input {
+            padding: 6px 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 33%;
+        }
+
+        .data-table {
+            width: 90%;
+            max-width: 1000px;
+            margin: 0 auto;
+            border-collapse: collapse;
+        }
+
+        .data-table th, .data-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #e6e6e6;
+        }
+
+        .data-table thead th {
+            background-color: #34495e;
+            color: white;
+        }
+
+        .load-more-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            width: 90%;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .bottom-nav.center {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<h1>Взятые книги</h1>
+
+<div class="top-actions">
+    <a th:href="@{/borrows/new}" class="btn">Взять книгу на прочтение</a>
+    <input type="text" id="searchInput" class="search-input" placeholder="Поиск">
+</div>
+
+<table border="1" class="data-table" id="borrows-table">
+    <thead>
+    <tr>
+        <th></th>
+        <th>Клиент</th>
+        <th>Дата рождения</th>
+        <th>Название книги</th>
+        <th>Автор</th>
+        <th>ISBN</th>
+        <th>Дата взятия</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody id="borrows-body">
+    <tr th:each="borrow : ${borrows}">
+        <td><a th:href="@{/borrows/edit/{id}(id=${borrow.id})}" title="Редактировать">🔃</a></td>
+        <td th:text="${borrow.client != null ? borrow.client.fullName : 'Не назначен'}"></td>
+        <td th:text="${borrow.client != null && borrow.client.birthDate != null ? borrow.client.birthDate : '-'}"></td>
+        <td th:text="${borrow.book != null ? borrow.book.title : '-'}"></td>
+        <td th:text="${borrow.book != null ? borrow.book.author : '-'}"></td>
+        <td th:text="${borrow.book != null ? borrow.book.isbn : '-'}"></td>
+        <td th:text="${borrow.borrowDate != null ? borrow.borrowDate : '-'}"></td>
+        <td><a th:href="@{/borrows/delete/{id}(id=${borrow.id})}" title="Удалить" onclick="return confirm('Удалить запись?');">❌</a></td>
+    </tr>
+    </tbody>
+</table>
+
+<div class="load-more-container" th:if="${hasMore}">
+    <button id="loadMoreBtn" class="btn">Показать ещё</button>
+</div>
+
+<div class="bottom-nav center">
+    <a th:href="@{/books}" class="btn">К списку книг</a>
+    <a th:href="@{/clients}" class="btn">К списку клиентов</a>
+</div>
+
+<script th:inline="javascript">
+    let page = [[${page}]];
+    const size = [[${size}]];
+    let currentQuery = '';
+
+    const tbody = document.getElementById("borrows-body");
+    const loadMoreBtn = document.getElementById("loadMoreBtn");
+    const searchInput = document.getElementById("searchInput");
+
+    async function loadBorrows(reset = false) {
+        const url = currentQuery
+            ? `/borrows/search?q=${encodeURIComponent(currentQuery)}&page=${page}&size=${size}`
+            : `/borrows/page?page=${page}&size=${size}`;
+
+        const response = await fetch(url);
+        const newBorrows = await response.json();
+
+        if (reset) tbody.innerHTML = "";
+
+        newBorrows.forEach(b => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td><a href="/borrows/edit/${b.id}" title="Редактировать">🔃</a></td>
+                <td>${b.client?.fullName ?? 'Не назначен'}</td>
+                <td>${b.client?.birthDate ?? '-'}</td>
+                <td>${b.book?.title ?? '-'}</td>
+                <td>${b.book?.author ?? '-'}</td>
+                <td>${b.book?.isbn ?? '-'}</td>
+                <td>${b.borrowDate ?? '-'}</td>
+                <td><a href="/borrows/delete/${b.id}" title="Удалить" onclick="return confirm('Удалить запись?');">❌</a></td>
+            `;
+            tbody.appendChild(row);
+        });
+
+        if (newBorrows.length < size) loadMoreBtn.style.display = "none";
+        else loadMoreBtn.style.display = "block";
+    }
+
+    loadMoreBtn?.addEventListener("click", () => {
+        page++;
+        loadBorrows();
+    });
+
+    searchInput.addEventListener("input", () => {
+        const filter = searchInput.value.trim();
+        if (filter.length < 3) currentQuery = '';
+        else currentQuery = filter;
+        page = 0;
+        loadBorrows(true);
+    });
+</script>
+</body>
+</html>

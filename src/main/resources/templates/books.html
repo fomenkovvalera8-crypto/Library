@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Список книг</title>
+    <link rel="stylesheet" th:href="@{/styles.css}">
+    <style>
+        body { font-family: Arial, sans-serif; }
+        h1 { text-align: center; margin-top: 20px; }
+
+        .top-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px auto;
+            width: 90%;
+            max-width: 1000px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .btn:hover { background-color: #45a049; }
+
+        .search-input {
+            padding: 6px 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 33%;
+        }
+
+        .data-table {
+            width: 90%;
+            max-width: 1000px;
+            margin: 0 auto;
+            border-collapse: collapse;
+        }
+
+        .data-table th, .data-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #e6e6e6;
+        }
+
+        .data-table thead th { background-color: #34495e; color: #fff; }
+        .icon-link { text-decoration: none; font-size: 18px; }
+
+        .center { text-align: center; margin: 20px 0; }
+        .bottom-nav { text-align: center; margin-top: 30px; }
+    </style>
+</head>
+<body>
+
+<h1>Список книг</h1>
+
+<div class="top-actions">
+    <a th:href="@{/books/new}" class="btn">Добавить книгу</a>
+    <input type="text" id="searchInput" class="search-input" placeholder="Поиск">
+</div>
+
+<table class="data-table" id="books-table">
+    <thead>
+    <tr>
+        <th></th>
+        <th>Название</th>
+        <th>Автор</th>
+        <th>ISBN</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody id="books-body">
+    <tr th:each="book : ${books}">
+        <td><a th:href="@{/books/edit/{id}(id=${book.id})}" title="Редактировать" class="icon-link">🔃</a></td>
+        <td th:text="${book.title}">Название книги</td>
+        <td th:text="${book.author}">Автор</td>
+        <td th:text="${book.isbn}">ISBN</td>
+        <td><a th:href="@{/books/delete/{id}(id=${book.id})}" title="Удалить" class="icon-link" onclick="return confirm('Удалить книгу?');">❌</a></td>
+    </tr>
+    </tbody>
+</table>
+
+<div class="center" th:if="${hasMore}">
+    <button id="loadMoreBtn" class="btn">Показать ещё</button>
+</div>
+
+<div class="bottom-nav">
+    <a th:href="@{/borrows}" class="btn">К списку взятых книг</a>
+    <a th:href="@{/clients}" class="btn">К списку клиентов</a>
+</div>
+
+<script th:inline="javascript">
+    let page = [[${page}]];
+    const size = [[${size}]];
+    const tbody = document.getElementById("books-body");
+    const loadMoreBtn = document.getElementById("loadMoreBtn");
+    const searchInput = document.getElementById("searchInput");
+
+    let currentQuery = "";
+    let searchMode = false;
+    let totalSearchResults = 0;
+
+    async function loadBooks(page, query = "") {
+        let url;
+        if (query && query.length >= 3) {
+            url = `/books/search?q=${encodeURIComponent(query)}&page=${page}&size=${size}`;
+        } else {
+            url = `/books/page?page=${page}&size=${size}`;
+        }
+
+        const response = await fetch(url);
+        return await response.json();
+    }
+
+    function renderBooks(books, append = false) {
+        if (!append) tbody.innerHTML = "";
+
+        books.forEach(b => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td><a href="/books/edit/${b.id}" class="icon-link" title="Редактировать">🔃</a></td>
+                <td>${b.title || '-'}</td>
+                <td>${b.author || '-'}</td>
+                <td>${b.isbn || '-'}</td>
+                <td><a href="/books/delete/${b.id}" class="icon-link" title="Удалить" onclick="return confirm('Удалить книгу?');">❌</a></td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    async function updateLoadMoreVisibility() {
+        if (searchMode) {
+            const countResponse = await fetch(`/books/search/count?q=${encodeURIComponent(currentQuery)}`);
+            totalSearchResults = await countResponse.json();
+            loadMoreBtn.style.display = ((page + 1) * size < totalSearchResults) ? "inline-block" : "none";
+        }
+    }
+
+    // Загрузка следующей страницы
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener("click", async () => {
+            page++;
+            const newBooks = await loadBooks(page, currentQuery);
+            renderBooks(newBooks, true);
+
+            if (!searchMode) {
+                if (newBooks.length < size) loadMoreBtn.style.display = "none";
+            } else {
+                await updateLoadMoreVisibility();
+            }
+        });
+    }
+
+    // Поиск
+    searchInput.addEventListener("input", async () => {
+        const query = searchInput.value.trim().toLowerCase();
+
+        if (query.length < 3) {
+            searchMode = false;
+            currentQuery = "";
+            page = 0;
+            const books = await loadBooks(page);
+            renderBooks(books);
+            loadMoreBtn.style.display = "inline-block";
+            return;
+        }
+
+        searchMode = true;
+        currentQuery = query;
+        page = 0;
+
+        const books = await loadBooks(page, query);
+        renderBooks(books);
+        await updateLoadMoreVisibility();
+    });
+</script>
+
+</body>
+</html>

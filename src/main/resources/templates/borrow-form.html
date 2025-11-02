@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Форма взятия книги</title>
+    <link rel="stylesheet" th:href="@{/styles.css}">
+    <style>
+        /* выпадающий список подсказок */
+        .suggestions {
+            position: absolute;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            max-height: 150px;
+            overflow-y: auto;
+            width: 100%;
+            z-index: 10;
+        }
+        .suggestion-item {
+            padding: 6px 10px;
+            cursor: pointer;
+        }
+        .suggestion-item:hover {
+            background-color: #f0f0f0;
+        }
+        .field-wrapper {
+            position: relative;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<h1 th:text="${borrow.id != null} ? 'Редактирование записи о выдаче' : 'Взятие книги на прочтение'"></h1>
+
+<!-- Форма добавления -->
+<form th:object="${borrow}" th:action="@{/borrows}" method="post" th:if="${borrow.id == null}">
+    <div class="field-wrapper">
+        <input type="hidden" th:field="*{client}" id="clientId-new">
+        <input type="text" id="clientSearch-new" placeholder="Введите имя клиента..." autocomplete="off">
+        <div id="clientSuggestions-new" class="suggestions"></div>
+    </div>
+
+    <div class="field-wrapper">
+        <input type="hidden" th:field="*{book}" id="bookId-new">
+        <input type="text" id="bookSearch-new" placeholder="Введите название или автора..." autocomplete="off">
+        <div id="bookSuggestions-new" class="suggestions"></div>
+    </div>
+
+    <label>Дата взятия:</label>
+    <input type="date" th:field="*{borrowDate}" required><br/>
+
+    <button type="submit" class="btn">Сохранить</button>
+</form>
+
+<!-- Форма редактирования -->
+<form th:object="${borrow}" th:action="@{/borrows/update/{id}(id=${borrow.id})}" method="post" th:if="${borrow.id != null}">
+    <div class="field-wrapper">
+        <input type="hidden" th:field="*{client}" id="clientId-edit">
+        <input type="text" id="clientSearch-edit"
+               th:value="${borrow.client.fullName}"
+               placeholder="Введите имя клиента..." autocomplete="off">
+        <div id="clientSuggestions-edit" class="suggestions"></div>
+    </div>
+
+    <div class="field-wrapper">
+        <input type="hidden" th:field="*{book}" id="bookId-edit">
+        <input type="text" id="bookSearch-edit"
+               th:value="${borrow.book.title} + ' — ' + ${borrow.book.author}"
+               placeholder="Введите название или автора..." autocomplete="off">
+        <div id="bookSuggestions-edit" class="suggestions"></div>
+    </div>
+
+    <label>Дата взятия:</label>
+    <input type="date" th:field="*{borrowDate}" required><br/>
+
+    <button type="submit" class="btn">Сохранить</button>
+</form>
+
+<div class="bottom-nav">
+    <a th:href="@{/borrows}" class="btn">Назад к списку взятых книг</a>
+</div>
+
+<script>
+    async function fetchSuggestions(url, query) {
+        try {
+            const res = await fetch(`${url}?q=${encodeURIComponent(query)}`);
+            if (!res.ok) return [];
+            return res.json();
+        } catch (e) {
+            console.error(e);
+            return [];
+        }
+    }
+
+    function setupAutocomplete(configs) {
+        configs.forEach(cfg => {
+            const input = document.getElementById(cfg.inputId);
+            const list = document.getElementById(cfg.suggestionsId);
+            const hidden = document.getElementById(cfg.hiddenId);
+
+            if (!input || !list || !hidden) return;
+
+            // Делает input только для чтения после выбора
+            input.readOnly = false;
+
+            input.addEventListener("input", async () => {
+                const q = input.value.trim();
+                list.innerHTML = "";
+                hidden.value = "";
+                input.readOnly = false; // разблокируем на случай новой попытки
+                if (q.length < 3) return;
+
+                const items = await fetchSuggestions(cfg.apiUrl, q);
+                items.forEach(item => {
+                    const div = document.createElement("div");
+                    div.className = "suggestion-item";
+                    div.textContent = cfg.formatter(item);
+                    div.onclick = () => {
+                        input.value = cfg.formatter(item);
+                        input.readOnly = true; // блокируем ввод после выбора
+                        hidden.value = item.id;
+                        list.innerHTML = "";
+                    };
+                    list.appendChild(div);
+                });
+            });
+
+            // Добавляем кнопку очистки
+            const clearBtn = document.createElement("span");
+            clearBtn.textContent = "❌";
+            clearBtn.style.marginLeft = "8px";
+            clearBtn.style.cursor = "pointer";
+            clearBtn.onclick = () => {
+                input.value = "";
+                input.readOnly = false;
+                hidden.value = "";
+            };
+            input.insertAdjacentElement("afterend", clearBtn);
+
+            document.addEventListener("click", e => {
+                if (!list.contains(e.target) && e.target !== input) {
+                    list.innerHTML = "";
+                }
+            });
+        });
+    }
+
+    // Инициализация автозаполнения для всех полей
+    setupAutocomplete([
+        {
+            inputId: "clientSearch-new",
+            suggestionsId: "clientSuggestions-new",
+            hiddenId: "clientId-new",
+            apiUrl: "/clients/search",
+            formatter: c => `${c.fullName} (${c.birthDate})`
+        },
+        {
+            inputId: "bookSearch-new",
+            suggestionsId: "bookSuggestions-new",
+            hiddenId: "bookId-new",
+            apiUrl: "/books/search",
+            formatter: b => `${b.title} — ${b.author}`
+        },
+        {
+            inputId: "clientSearch-edit",
+            suggestionsId: "clientSuggestions-edit",
+            hiddenId: "clientId-edit",
+            apiUrl: "/clients/search",
+            formatter: c => `${c.fullName} (${c.birthDate})`
+        },
+        {
+            inputId: "bookSearch-edit",
+            suggestionsId: "bookSuggestions-edit",
+            hiddenId: "bookId-edit",
+            apiUrl: "/books/search",
+            formatter: b => `${b.title} — ${b.author}`
+        }
+    ]);
+    document.querySelectorAll("form").forEach(form => {
+        form.addEventListener("submit", e => {
+            const clientHidden = form.querySelector('input[type="hidden"][id^="clientId"]');
+            const bookHidden = form.querySelector('input[type="hidden"][id^="bookId"]');
+
+            if (!clientHidden?.value || !bookHidden?.value) {
+                e.preventDefault();
+                alert("Пожалуйста, выберите клиента и книгу из списка подсказок.");
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

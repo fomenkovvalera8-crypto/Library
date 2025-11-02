@@ -1,0 +1,149 @@
+/* === Общие стили === */
+body {
+    font-family: "Segoe UI", Roboto, sans-serif;
+    background-color: #f5f7fa;
+    margin: 0;
+    padding: 30px;
+    color: #333;
+}
+
+h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+a {
+    text-decoration: none;
+    color: #3498db;
+    transition: 0.2s;
+}
+
+a:hover {
+    color: #1d6fa5;
+}
+
+/* === Таблицы === */
+table {
+    width: 90%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background-color: #34495e;
+    color: #fff;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* === Кнопки === */
+button, .btn {
+    display: inline-block;
+    padding: 8px 14px;
+    margin: 5px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: 0.2s;
+}
+
+button:hover, .btn:hover {
+    background-color: #1d6fa5;
+}
+
+/* === Формы === */
+form {
+    width: 400px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+input, select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+input:focus, select:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 4px rgba(52, 152, 219, 0.3);
+}
+
+/* === Верхняя панель с кнопкой "Добавить" === */
+.top-actions {
+    width: 90%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.top-actions .btn {
+    font-weight: 500;
+    background-color: #2ecc71;
+}
+
+.top-actions .btn:hover {
+    background-color: #27ae60;
+}
+
+/* === Нижняя навигация === */
+.bottom-nav {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.bottom-nav a {
+    margin: 0 10px;
+    font-weight: 500;
+    background-color: #3498db;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 5px;
+    transition: 0.2s;
+}
+
+.bottom-nav a:hover {
+    background-color: #1d6fa5;
+}
+
+.icon-link {
+    text-decoration: none;
+    font-size: 18px;
+    padding: 2px 6px;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.icon-link:hover {
+    transform: scale(1.2);
+    background-color: #f0f0f0;
+    border-radius: 4px;
+}

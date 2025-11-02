@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Форма клиента</title>
+    <link rel="stylesheet" th:href="@{/styles.css}">
+</head>
+<body>
+<h1 th:text="${client.id != null} ? 'Редактирование клиента' : 'Добавление клиента'"></h1>
+
+<!-- Форма для редактирования -->
+<form th:if="${client.id != null}" th:action="@{/clients/update/{id}(id=${client.id})}" th:object="${client}" method="post">
+    <label>ФИО:</label>
+    <input type="text" th:field="*{fullName}" placeholder="ФИО" required/><br/>
+    <label>Дата рождения:</label>
+    <input type="date" th:field="*{birthDate}" required/><br/>
+    <button type="submit">Сохранить</button>
+</form>
+
+<!-- Форма для добавления нового клиента -->
+<form th:unless="${client.id != null}" th:action="@{/clients}" th:object="${client}" method="post">
+    <label>ФИО:</label>
+    <input type="text" th:field="*{fullName}" placeholder="ФИО" required/><br/>
+    <label>Дата рождения:</label>
+    <input type="date" th:field="*{birthDate}" required/><br/>
+    <button type="submit">Сохранить</button>
+</form>
+
+<div class="bottom-nav">
+    <a th:href="@{/clients}">Назад к списку клиентов</a>
+</div>
+</body>
+</html>
