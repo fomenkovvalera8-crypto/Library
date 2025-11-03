@@ -47,7 +47,7 @@ public class ClientService {
 
     public List<Client> searchByNamePaged(String query, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
-        return clientRepository.findByFullNameContainingIgnoreCase(query, pageable).getContent();
+        return clientRepository.searchAllColumns(query, pageable).getContent();
     }
 
     public List<Client> getClientsPage(int page, int size) {

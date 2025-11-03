@@ -4,6 +4,8 @@ import org.library.model.Borrow;
 import org.library.repository.BorrowRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -50,8 +52,7 @@ public class BorrowService {
         return borrowRepository.count();
     }
     public List<Borrow> searchBorrows(String query, int page, int size) {
-        Page<Borrow> p = borrowRepository.findByClientFullNameContainingIgnoreCaseOrBookTitleContainingIgnoreCase(
-                query, query, PageRequest.of(page, size));
-        return p.getContent();
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
+        return borrowRepository.searchAllColumns(query, pageable).getContent();
     }
 }

@@ -76,7 +76,6 @@ public class BookController {
         return bookService.searchByTitleOrAuthorPaged(query, page, size);
     }
 
-
     @GetMapping("/page")
     @ResponseBody
     public List<Book> getBooksPage(@RequestParam(defaultValue = "0") int page,

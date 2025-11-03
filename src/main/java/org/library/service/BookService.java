@@ -49,7 +49,7 @@ public class BookService {
     public List<Book> searchByTitleOrAuthorPaged(String query, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
         return bookRepository
-                .findByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCase(query, query, pageable)
+                .findByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCaseOrIsbnContainingIgnoreCase(query, query, query, pageable)
                 .getContent();
     }
 

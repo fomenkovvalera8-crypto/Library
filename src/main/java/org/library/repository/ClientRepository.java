@@ -4,10 +4,12 @@ import org.library.model.Client;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.List;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface ClientRepository extends JpaRepository<Client, Long> {
-    List<Client> findByFullNameContainingIgnoreCase(String fullName);
-    Page<Client> findByFullNameContainingIgnoreCase(String fullName, Pageable pageable);
+    @Query("SELECT c FROM Client c " +
+            "WHERE LOWER(c.fullName) LIKE LOWER(CONCAT('%', :query, '%')) " +
+            "OR CAST(c.birthDate AS string) LIKE LOWER(CONCAT('%', :query, '%'))")
+    Page<Client> searchAllColumns(@Param("query") String query, Pageable pageable);
 }
