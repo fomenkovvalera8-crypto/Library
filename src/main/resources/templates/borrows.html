@@ -95,11 +95,11 @@
     <tr th:each="borrow : ${borrows}">
         <td><a th:href="@{/borrows/edit/{id}(id=${borrow.id})}" title="Редактировать">🔃</a></td>
         <td th:text="${borrow.client != null ? borrow.client.fullName : 'Не назначен'}"></td>
-        <td th:text="${borrow.client != null && borrow.client.birthDate != null ? borrow.client.birthDate : '-'}"></td>
+        <td th:text="${borrow.client != null && borrow.client.birthDate != null ? #temporals.format(borrow.client.birthDate, 'dd.MM.yyyy') : '-'}"></td>
         <td th:text="${borrow.book != null ? borrow.book.title : '-'}"></td>
         <td th:text="${borrow.book != null ? borrow.book.author : '-'}"></td>
         <td th:text="${borrow.book != null ? borrow.book.isbn : '-'}"></td>
-        <td th:text="${borrow.borrowDate != null ? borrow.borrowDate : '-'}"></td>
+        <td th:text="${borrow.borrowDate != null ? #temporals.format(borrow.borrowDate, 'dd.MM.yyyy') : '-'}"></td>
         <td><a href="#" data-id="${b.id}" class="delete-link" title="Удалить">❌</a></td>
     </tr>
     </tbody>
@@ -133,18 +133,27 @@
 
         if (reset) tbody.innerHTML = "";
 
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}.${month}.${year}`;
+        }
+
         newBorrows.forEach(b => {
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td><a href="/borrows/edit/${b.id}" title="Редактировать">🔃</a></td>
-                <td>${b.client?.fullName ?? 'Не назначен'}</td>
-                <td>${b.client?.birthDate ?? '-'}</td>
-                <td>${b.book?.title ?? '-'}</td>
-                <td>${b.book?.author ?? '-'}</td>
-                <td>${b.book?.isbn ?? '-'}</td>
-                <td>${b.borrowDate ?? '-'}</td>
-                <td><a href="#" class="delete-link" data-id="${b.id}" title="Удалить">❌</a></td>
-            `;
+        <td><a href="/borrows/edit/${b.id}" title="Редактировать">🔃</a></td>
+        <td>${b.client?.fullName ?? 'Не назначен'}</td>
+        <td>${formatDate(b.client?.birthDate)}</td>
+        <td>${b.book?.title ?? '-'}</td>
+        <td>${b.book?.author ?? '-'}</td>
+        <td>${b.book?.isbn ?? '-'}</td>
+        <td>${formatDate(b.borrowDate)}</td>
+        <td><a href="#" class="delete-link" data-id="${b.id}" title="Удалить">❌</a></td>
+    `;
             tbody.appendChild(row);
         });
 

@@ -86,7 +86,7 @@
     <tr th:each="client : ${clients}">
         <td><a th:href="@{/clients/edit/{id}(id=${client.id})}" title="Редактировать">🔃</a></td>
         <td th:text="${client.fullName}"></td>
-        <td th:text="${client.birthDate}"></td>
+        <td th:text="${client.birthDate != null ? #temporals.format(client.birthDate, 'dd.MM.yyyy') : '-'}"></td>
         <td><a href="#" class="delete-link" data-id="${client.id}" title="Удалить">❌</a></td>
     </tr>
     </tbody>
@@ -110,6 +110,16 @@
     const loadMoreBtn = document.getElementById("loadMoreBtn");
     const searchInput = document.getElementById("searchInput");
 
+    // функция для форматирования даты
+    function formatDate(dateStr) {
+        if (!dateStr) return '-';
+        const date = new Date(dateStr);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}.${month}.${year}`;
+    }
+
     async function loadClients(reset = false) {
         const url = currentQuery
             ? `/clients/search?q=${encodeURIComponent(currentQuery)}&page=${page}&size=${size}`
@@ -125,7 +135,7 @@
             row.innerHTML = `
                 <td><a href="/clients/edit/${c.id}" class="icon-link">🔃</a></td>
                 <td>${c.fullName}</td>
-                <td>${c.birthDate ?? '-'}</td>
+                <td>${formatDate(c.birthDate)}</td>
                 <td><a href="#" class="delete-link" data-id="${c.id}" title="Удалить">❌</a></td>
             `;
             tbody.appendChild(row);
@@ -150,6 +160,7 @@
         page = 0;
         loadClients(true);
     });
+
     tbody.addEventListener("click", async (e) => {
         const link = e.target.closest(".delete-link");
         if (!link) return;

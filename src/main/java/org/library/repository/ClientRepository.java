@@ -10,6 +10,6 @@ import org.springframework.data.repository.query.Param;
 public interface ClientRepository extends JpaRepository<Client, Long> {
     @Query("SELECT c FROM Client c " +
             "WHERE LOWER(c.fullName) LIKE LOWER(CONCAT('%', :query, '%')) " +
-            "OR CAST(c.birthDate AS string) LIKE LOWER(CONCAT('%', :query, '%'))")
+            "OR (c.birthDate IS NOT NULL AND FUNCTION('TO_CHAR', c.birthDate, 'DD.MM.YYYY') LIKE CONCAT('%', :query, '%'))")
     Page<Client> searchAllColumns(@Param("query") String query, Pageable pageable);
 }
