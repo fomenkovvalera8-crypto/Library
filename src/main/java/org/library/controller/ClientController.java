@@ -64,6 +64,12 @@ public class ClientController {
         return "redirect:/clients";
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseBody
+    public void deleteClientAjax(@PathVariable Long id) {
+        clientService.deleteClient(id);
+    }
+
     @GetMapping("/delete/{id}")
     public String deleteClient(@PathVariable Long id) {
         clientService.deleteClient(id);

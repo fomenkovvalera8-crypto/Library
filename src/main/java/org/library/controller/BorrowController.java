@@ -87,6 +87,12 @@ public class BorrowController {
         return "redirect:/borrows";
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseBody
+    public void deleteBorrowAjax(@PathVariable Long id) {
+        borrowService.deleteBorrow(id);
+    }
+
     @GetMapping("/page")
     @ResponseBody
     public List<Borrow> getBorrowsPage(@RequestParam(defaultValue = "0") int page,

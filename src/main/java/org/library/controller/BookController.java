@@ -63,7 +63,11 @@ public class BookController {
         bookService.deleteBook(id);
         return "redirect:/books";
     }
-
+    @DeleteMapping("/{id}")
+    @ResponseBody
+    public void deleteBookAjax(@PathVariable Long id) {
+        bookService.deleteBook(id);
+    }
     @GetMapping("/search")
     @ResponseBody
     public List<Book> searchBooks(@RequestParam("q") String query,

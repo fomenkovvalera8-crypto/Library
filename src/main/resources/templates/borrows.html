@@ -100,7 +100,7 @@
         <td th:text="${borrow.book != null ? borrow.book.author : '-'}"></td>
         <td th:text="${borrow.book != null ? borrow.book.isbn : '-'}"></td>
         <td th:text="${borrow.borrowDate != null ? borrow.borrowDate : '-'}"></td>
-        <td><a th:href="@{/borrows/delete/{id}(id=${borrow.id})}" title="Удалить" onclick="return confirm('Удалить запись?');">❌</a></td>
+        <td><a href="#" data-id="${b.id}" class="delete-link" title="Удалить">❌</a></td>
     </tr>
     </tbody>
 </table>
@@ -143,7 +143,7 @@
                 <td>${b.book?.author ?? '-'}</td>
                 <td>${b.book?.isbn ?? '-'}</td>
                 <td>${b.borrowDate ?? '-'}</td>
-                <td><a href="/borrows/delete/${b.id}" title="Удалить" onclick="return confirm('Удалить запись?');">❌</a></td>
+                <td><a href="#" class="delete-link" data-id="${b.id}" title="Удалить">❌</a></td>
             `;
             tbody.appendChild(row);
         });
@@ -163,6 +163,24 @@
         else currentQuery = filter;
         page = 0;
         loadBorrows(true);
+    });
+    tbody.addEventListener("click", async (e) => {
+        const link = e.target.closest(".delete-link");
+        if (!link) return;
+
+        e.preventDefault();
+        const id = link.dataset.id;
+
+        if (!confirm("Удалить запись?")) return;
+
+        const response = await fetch(`/borrows/${id}`, { method: "DELETE" });
+
+        if (response.ok) {
+            // Удаляем строку из DOM
+            link.closest("tr").remove();
+        } else {
+            alert("Ошибка при удалении записи");
+        }
     });
 </script>
 </body>

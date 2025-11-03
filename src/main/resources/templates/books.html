@@ -130,7 +130,7 @@
                 <td>${b.title || '-'}</td>
                 <td>${b.author || '-'}</td>
                 <td>${b.isbn || '-'}</td>
-                <td><a href="/books/delete/${b.id}" class="icon-link" title="Удалить" onclick="return confirm('Удалить книгу?');">❌</a></td>
+                <td><a href="#" class="icon-link delete-link" data-id="${b.id}" title="Удалить">❌</a></td>
             `;
             tbody.appendChild(row);
         });
@@ -180,6 +180,24 @@
         const books = await loadBooks(page, query);
         renderBooks(books);
         await updateLoadMoreVisibility();
+    });
+    tbody.addEventListener("click", async (e) => {
+        const link = e.target.closest(".delete-link");
+        if (!link) return;
+
+        e.preventDefault();
+        const id = link.dataset.id;
+
+        if (!confirm("Удалить книгу?")) return;
+
+        const response = await fetch(`/books/${id}`, { method: "DELETE" });
+
+        if (response.ok) {
+            // Удаляем строку из DOM
+            link.closest("tr").remove();
+        } else {
+            alert("Ошибка при удалении книги");
+        }
     });
 </script>
 

@@ -87,7 +87,7 @@
         <td><a th:href="@{/clients/edit/{id}(id=${client.id})}" title="Редактировать">🔃</a></td>
         <td th:text="${client.fullName}"></td>
         <td th:text="${client.birthDate}"></td>
-        <td><a th:href="@{/clients/delete/{id}(id=${client.id})}" title="Удалить">❌</a></td>
+        <td><a href="#" class="delete-link" data-id="${client.id}" title="Удалить">❌</a></td>
     </tr>
     </tbody>
 </table>
@@ -125,8 +125,8 @@
             row.innerHTML = `
                 <td><a href="/clients/edit/${c.id}" class="icon-link">🔃</a></td>
                 <td>${c.fullName}</td>
-                <td>${c.birthDate}</td>
-                <td><a href="/clients/delete/${c.id}" class="icon-link">❌</a></td>
+                <td>${c.birthDate ?? '-'}</td>
+                <td><a href="#" class="delete-link" data-id="${c.id}" title="Удалить">❌</a></td>
             `;
             tbody.appendChild(row);
         });
@@ -149,6 +149,23 @@
         }
         page = 0;
         loadClients(true);
+    });
+    tbody.addEventListener("click", async (e) => {
+        const link = e.target.closest(".delete-link");
+        if (!link) return;
+
+        e.preventDefault();
+        const id = link.dataset.id;
+
+        if (!confirm("Удалить клиента?")) return;
+
+        const response = await fetch(`/clients/${id}`, { method: "DELETE" });
+
+        if (response.ok) {
+            link.closest("tr").remove();
+        } else {
+            alert("Ошибка при удалении клиента");
+        }
     });
 </script>
 </body>
