@@ -4,8 +4,10 @@ import org.library.model.Client;
 import org.library.service.ClientService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Controller
@@ -46,7 +48,10 @@ public class ClientController {
     }
 
     @PostMapping
-    public String addClient(@ModelAttribute Client client) {
+    public String addClient(@ModelAttribute @Valid Client client, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "client-form";
+        }
         clientService.saveClient(client);
         return "redirect:/clients";
     }
@@ -59,7 +64,12 @@ public class ClientController {
     }
 
     @PostMapping("/update/{id}")
-    public String updateClient(@PathVariable Long id, @ModelAttribute Client client) {
+    public String updateClient(@PathVariable Long id, @ModelAttribute @Valid Client client, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            client.setId(id);
+            return "client-form";
+        }
+
         clientService.updateClient(id, client);
         return "redirect:/clients";
     }

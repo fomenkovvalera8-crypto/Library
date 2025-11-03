@@ -5,8 +5,10 @@ import org.library.model.Book;
 import org.library.service.BookService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Controller
@@ -40,7 +42,11 @@ public class BookController {
     }
 
     @PostMapping
-    public String addBook(@ModelAttribute Book book) {
+    public String addBook(@ModelAttribute @Valid Book book, BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("book", book);
+            return "book-form"; // возвращаем форму с ошибками
+        }
         bookService.saveBook(book);
         return "redirect:/books";
     }
@@ -53,7 +59,11 @@ public class BookController {
     }
 
     @PostMapping("/update/{id}")
-    public String updateBook(@PathVariable Long id, @ModelAttribute Book book) {
+    public String updateBook(@PathVariable Long id, @ModelAttribute @Valid Book book, BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("book", book);
+            return "book-form"; // возвращаем форму с ошибками
+        }
         bookService.updateBook(id, book);
         return "redirect:/books";
     }

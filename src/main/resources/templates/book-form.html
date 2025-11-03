@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <title>Форма книги</title>
     <link rel="stylesheet" th:href="@{/styles.css}">
+    <style>
+        .error { color: red; font-size: 0.9em; margin-bottom: 5px; }
+        label { display: block; margin-top: 10px; }
+    </style>
 </head>
 <body>
 <h1 th:text="${book.id != null} ? 'Редактирование книги' : 'Добавление книги'"></h1>
@@ -11,22 +15,34 @@
 <!-- Форма для редактирования -->
 <form th:if="${book.id != null}" th:action="@{/books/update/{id}(id=${book.id})}" th:object="${book}" method="post">
     <label>Название:</label>
-    <input type="text" th:field="*{title}" placeholder="Название книги" required/><br/>
+    <input type="text" th:field="*{title}" placeholder="Название книги" required/>
+    <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="error"></div>
+
     <label>Автор:</label>
-    <input type="text" th:field="*{author}" placeholder="Автор" required/><br/>
+    <input type="text" th:field="*{author}" placeholder="Автор" required/>
+    <div th:if="${#fields.hasErrors('author')}" th:errors="*{author}" class="error"></div>
+
     <label>ISBN:</label>
-    <input type="text" th:field="*{isbn}" placeholder="ISBN" required/><br/>
+    <input type="text" th:field="*{isbn}" placeholder="ISBN" required/>
+    <div th:if="${#fields.hasErrors('isbn')}" th:errors="*{isbn}" class="error"></div>
+
     <button type="submit">Сохранить</button>
 </form>
 
 <!-- Форма для добавления новой книги -->
 <form th:unless="${book.id != null}" th:action="@{/books}" th:object="${book}" method="post">
     <label>Название:</label>
-    <input type="text" th:field="*{title}" placeholder="Название книги" required/><br/>
+    <input type="text" th:field="*{title}" placeholder="Название книги" required/>
+    <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="error"></div>
+
     <label>Автор:</label>
-    <input type="text" th:field="*{author}" placeholder="Автор" required/><br/>
+    <input type="text" th:field="*{author}" placeholder="Автор" required/>
+    <div th:if="${#fields.hasErrors('author')}" th:errors="*{author}" class="error"></div>
+
     <label>ISBN:</label>
-    <input type="text" th:field="*{isbn}" placeholder="ISBN" required/><br/>
+    <input type="text" th:field="*{isbn}" placeholder="ISBN" required/>
+    <div th:if="${#fields.hasErrors('isbn')}" th:errors="*{isbn}" class="error"></div>
+
     <button type="submit">Сохранить</button>
 </form>
 

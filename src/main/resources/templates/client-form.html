@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <title>Форма клиента</title>
     <link rel="stylesheet" th:href="@{/styles.css}">
+    <style>
+        .error {
+            color: red;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        label { display: block; margin-top: 10px; }
+        input { width: 100%; padding: 5px; margin-top: 2px; }
+        button { margin-top: 10px; }
+    </style>
 </head>
 <body>
 <h1 th:text="${client.id != null} ? 'Редактирование клиента' : 'Добавление клиента'"></h1>
@@ -11,18 +21,26 @@
 <!-- Форма для редактирования -->
 <form th:if="${client.id != null}" th:action="@{/clients/update/{id}(id=${client.id})}" th:object="${client}" method="post">
     <label>ФИО:</label>
-    <input type="text" th:field="*{fullName}" placeholder="ФИО" required/><br/>
+    <input type="text" th:field="*{fullName}" placeholder="ФИО" required/>
+    <div th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}" class="error"></div>
+
     <label>Дата рождения:</label>
-    <input type="date" th:field="*{birthDate}" required/><br/>
+    <input type="date" th:field="*{birthDate}" required/>
+    <div th:if="${#fields.hasErrors('birthDate')}" th:errors="*{birthDate}" class="error"></div>
+
     <button type="submit">Сохранить</button>
 </form>
 
 <!-- Форма для добавления нового клиента -->
 <form th:unless="${client.id != null}" th:action="@{/clients}" th:object="${client}" method="post">
     <label>ФИО:</label>
-    <input type="text" th:field="*{fullName}" placeholder="ФИО" required/><br/>
+    <input type="text" th:field="*{fullName}" placeholder="ФИО" required/>
+    <div th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}" class="error"></div>
+
     <label>Дата рождения:</label>
-    <input type="date" th:field="*{birthDate}" required/><br/>
+    <input type="date" th:field="*{birthDate}" required/>
+    <div th:if="${#fields.hasErrors('birthDate')}" th:errors="*{birthDate}" class="error"></div>
+
     <button type="submit">Сохранить</button>
 </form>
 
