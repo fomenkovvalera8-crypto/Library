@@ -1,12 +1,11 @@
 let page = 0;
 const size = 10;
-let currentQuery = ''; // строка поиска
+let currentQuery = '';
 
 const tbody = document.getElementById("clients-body");
 const loadMoreBtn = document.getElementById("loadMoreBtn");
 const searchInput = document.getElementById("searchInput");
 
-// функция для форматирования даты
 function formatDate(dateStr) {
     if (!dateStr) return '-';
     const date = new Date(dateStr);

@@ -7,7 +7,6 @@ const searchInput = document.getElementById("searchInput");
 
 let currentQuery = "";
 
-// Загрузка данных с сервера
 async function loadBooks(pageNum, query = "") {
     let url;
     if (query && query.length >= 3) {
@@ -21,7 +20,6 @@ async function loadBooks(pageNum, query = "") {
     return await res.json();
 }
 
-// Отрисовка таблицы
 function renderBooks(books, append = false) {
     if (!append) tbody.innerHTML = "";
     books.forEach(b => {
@@ -37,7 +35,6 @@ function renderBooks(books, append = false) {
     });
 }
 
-// Кнопка "Показать ещё"
 loadMoreBtn?.addEventListener("click", async () => {
     page++;
     const result = await loadBooks(page, currentQuery);
@@ -45,7 +42,6 @@ loadMoreBtn?.addEventListener("click", async () => {
     loadMoreBtn.style.display = result.hasMore ? "inline-block" : "none";
 });
 
-// Поиск
 searchInput.addEventListener("input", async () => {
     const query = searchInput.value.trim().toLowerCase();
     currentQuery = query.length >= 3 ? query : "";
@@ -55,7 +51,6 @@ searchInput.addEventListener("input", async () => {
     loadMoreBtn.style.display = result.hasMore ? "inline-block" : "none";
 });
 
-// Удаление
 tbody.addEventListener("click", async (e) => {
     const link = e.target.closest(".delete-link");
     if (!link) return;
@@ -69,7 +64,6 @@ tbody.addEventListener("click", async (e) => {
     else alert("Ошибка при удалении книги");
 });
 
-// Первоначальная загрузка
 document.addEventListener("DOMContentLoaded", async () => {
     const result = await loadBooks(page);
     renderBooks(result.content);
