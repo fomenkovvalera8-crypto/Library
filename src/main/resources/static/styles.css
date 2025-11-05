@@ -26,6 +26,7 @@ a:hover {
 /* === Таблицы === */
 table {
     width: 90%;
+    max-width: 1000px;
     margin: 20px auto;
     border-collapse: collapse;
     background-color: #fff;
@@ -98,12 +99,14 @@ input:focus, select:focus {
     box-shadow: 0 0 4px rgba(52, 152, 219, 0.3);
 }
 
-/* === Верхняя панель с кнопкой "Добавить" === */
+/* === Верхняя панель с кнопкой "Добавить" и поиском === */
 .top-actions {
     width: 90%;
-    margin: 0 auto;
+    max-width: 1000px;
+    margin: 0 auto 20px;
     display: flex;
-    justify-content: flex-start;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .top-actions .btn {
@@ -113,6 +116,30 @@ input:focus, select:focus {
 
 .top-actions .btn:hover {
     background-color: #27ae60;
+}
+
+/* === Поле поиска === */
+.search-input {
+    padding: 6px 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 33%;
+}
+
+/* === Центровка элементов === */
+.center {
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* === Кнопка "Показать ещё" === */
+.load-more-container,
+.center button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px auto;
 }
 
 /* === Нижняя навигация === */
@@ -135,6 +162,7 @@ input:focus, select:focus {
     background-color: #1d6fa5;
 }
 
+/* === Иконки (редактирование / удаление) === */
 .icon-link {
     text-decoration: none;
     font-size: 18px;
