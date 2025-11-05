@@ -88,7 +88,7 @@
 
             const data = await res.json();
 
-            if (data.books) return data.books;
+            if (data.content) return data.content;
 
             if (Array.isArray(data)) return data;
 
