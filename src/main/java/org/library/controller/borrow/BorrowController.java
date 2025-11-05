@@ -1,7 +1,8 @@
-package org.library.controller;
+package org.library.controller.borrow;
 
+import lombok.RequiredArgsConstructor;
 import org.library.model.Borrow;
-import org.library.service.BookService;
+import org.library.service.book.BookCRUDService;
 import org.library.service.BorrowService;
 import org.library.service.ClientService;
 import org.springframework.stereotype.Controller;
@@ -12,17 +13,16 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/borrows")
+@RequiredArgsConstructor
 public class BorrowController {
 
     private final BorrowService borrowService;
-    private final BookService bookService;
+    private final BookCRUDService bookCRUDService;
     private final ClientService clientService;
 
-    public BorrowController(BorrowService borrowService, BookService bookService, ClientService clientService) {
-        this.borrowService = borrowService;
-        this.bookService = bookService;
-        this.clientService = clientService;
-    }
+    private static final String VIEW_BORROWS = "borrows";
+    private static final String VIEW_FORM = "borrow-form";
+    private static final String REDIRECT_BORROWS = "redirect:/borrows";
 
     @GetMapping
     public String listBorrows(Model model,
@@ -36,27 +36,31 @@ public class BorrowController {
         model.addAttribute("page", page);
         model.addAttribute("size", size);
         model.addAttribute("hasMore", (page + 1) * size < total);
-        return "borrows";
+        return VIEW_BORROWS;
     }
 
     @GetMapping("/new")
     public String showAddForm(Model model) {
         model.addAttribute("borrow", new Borrow());
-        model.addAttribute("books", bookService.getAllBooks());
+        model.addAttribute("books", bookCRUDService.getAllBooks());
         model.addAttribute("clients", clientService.getAllClients());
-        return "borrow-form";
+        return VIEW_FORM;
     }
 
     @PostMapping
     public String addBorrow(@ModelAttribute Borrow borrow) {
+        validateBorrowEntities(borrow);
+        borrowService.saveBorrow(borrow);
+        return REDIRECT_BORROWS;
+    }
+
+    private void validateBorrowEntities(@ModelAttribute Borrow borrow) {
         if (borrow.getClient() == null || !clientService.getClientById(borrow.getClient().getId()).isPresent()) {
             throw new IllegalArgumentException("Клиент не найден");
         }
-        if (borrow.getBook() == null || !bookService.getBookById(borrow.getBook().getId()).isPresent()) {
+        if (borrow.getBook() == null || !bookCRUDService.getBookById(borrow.getBook().getId()).isPresent()) {
             throw new IllegalArgumentException("Книга не найдена");
         }
-        borrowService.saveBorrow(borrow);
-        return "redirect:/borrows";
     }
 
     @GetMapping("/edit/{id}")
@@ -64,50 +68,23 @@ public class BorrowController {
         Borrow borrow = borrowService.getBorrowById(id)
                 .orElseThrow(() -> new RuntimeException("Borrow not found"));
         model.addAttribute("borrow", borrow);
-        model.addAttribute("books", bookService.getAllBooks());
+        model.addAttribute("books", bookCRUDService.getAllBooks());
         model.addAttribute("clients", clientService.getAllClients());
-        return "borrow-form";
+        return VIEW_FORM;
     }
 
     @PostMapping("/update/{id}")
     public String updateBorrow(@PathVariable Long id, @ModelAttribute Borrow borrow) {
-        if (borrow.getClient() == null || !clientService.getClientById(borrow.getClient().getId()).isPresent()) {
-            throw new IllegalArgumentException("Клиент не найден");
-        }
-        if (borrow.getBook() == null || !bookService.getBookById(borrow.getBook().getId()).isPresent()) {
-            throw new IllegalArgumentException("Книга не найдена");
-        }
+        validateBorrowEntities(borrow);
         borrowService.updateBorrow(id, borrow);
-        return "redirect:/borrows";
+        return REDIRECT_BORROWS;
     }
 
     @GetMapping("/delete/{id}")
     public String deleteBorrow(@PathVariable Long id) {
         borrowService.deleteBorrow(id);
-        return "redirect:/borrows";
+        return REDIRECT_BORROWS;
     }
 
-    @DeleteMapping("/{id}")
-    @ResponseBody
-    public void deleteBorrowAjax(@PathVariable Long id) {
-        borrowService.deleteBorrow(id);
-    }
 
-    @GetMapping("/page")
-    @ResponseBody
-    public List<Borrow> getBorrowsPage(@RequestParam(defaultValue = "0") int page,
-                                       @RequestParam(defaultValue = "10") int size) {
-        return borrowService.getBorrowsPage(page, size);
-    }
-
-    @GetMapping("/search")
-    @ResponseBody
-    public List<Borrow> searchBorrows(@RequestParam("q") String query,
-                                      @RequestParam(defaultValue = "0") int page,
-                                      @RequestParam(defaultValue = "10") int size) {
-        if (query == null || query.trim().isEmpty()) {
-            return borrowService.getBorrowsPage(page, size);
-        }
-        return borrowService.searchBorrows(query, page, size);
-    }
 }

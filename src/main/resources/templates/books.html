@@ -106,14 +106,13 @@
 
     let currentQuery = "";
     let searchMode = false;
-    let totalSearchResults = 0;
 
     async function loadBooks(page, query = "") {
         let url;
         if (query && query.length >= 3) {
-            url = `/books/search?q=${encodeURIComponent(query)}&page=${page}&size=${size}`;
+            url = `/api/books/search?q=${encodeURIComponent(query)}&page=${page}&size=${size}`;
         } else {
-            url = `/books/page?page=${page}&size=${size}`;
+            url = `/api/books/page?page=${page}&size=${size}`;
         }
 
         const response = await fetch(url);
@@ -136,26 +135,13 @@
         });
     }
 
-    async function updateLoadMoreVisibility() {
-        if (searchMode) {
-            const countResponse = await fetch(`/books/search/count?q=${encodeURIComponent(currentQuery)}`);
-            totalSearchResults = await countResponse.json();
-            loadMoreBtn.style.display = ((page + 1) * size < totalSearchResults) ? "inline-block" : "none";
-        }
-    }
-
     // Загрузка следующей страницы
     if (loadMoreBtn) {
         loadMoreBtn.addEventListener("click", async () => {
             page++;
             const newBooks = await loadBooks(page, currentQuery);
-            renderBooks(newBooks, true);
-
-            if (!searchMode) {
-                if (newBooks.length < size) loadMoreBtn.style.display = "none";
-            } else {
-                await updateLoadMoreVisibility();
-            }
+            renderBooks(newBooks.books, true);
+            loadMoreBtn.style.display = newBooks.hasMore ? "inline-block" : "none";
         });
     }
 
@@ -168,8 +154,8 @@
             currentQuery = "";
             page = 0;
             const books = await loadBooks(page);
-            renderBooks(books);
-            loadMoreBtn.style.display = "inline-block";
+            renderBooks(books.books);
+            loadMoreBtn.style.display = books.hasMore ? "inline-block" : "none";
             return;
         }
 
@@ -178,8 +164,8 @@
         page = 0;
 
         const books = await loadBooks(page, query);
-        renderBooks(books);
-        await updateLoadMoreVisibility();
+        renderBooks(books.books);
+        loadMoreBtn.style.display = books.hasMore ? "inline-block" : "none";
     });
     tbody.addEventListener("click", async (e) => {
         const link = e.target.closest(".delete-link");
@@ -190,7 +176,7 @@
 
         if (!confirm("Удалить книгу?")) return;
 
-        const response = await fetch(`/books/${id}`, { method: "DELETE" });
+        const response = await fetch(`/api/books/${id}`, { method: "DELETE" });
 
         if (response.ok) {
             // Удаляем строку из DOM

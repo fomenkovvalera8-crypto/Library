@@ -1,10 +1,14 @@
 package org.library.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 
+@Setter
+@Getter
 @Entity
 public class Borrow {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,12 +25,4 @@ public class Borrow {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate borrowDate;
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public Client getClient() { return client; }
-    public void setClient(Client client) { this.client = client; }
-    public Book getBook() { return book; }
-    public void setBook(Book book) { this.book = book; }
-    public LocalDate getBorrowDate() { return borrowDate; }
-    public void setBorrowDate(LocalDate borrowDate) { this.borrowDate = borrowDate; }
 }

@@ -125,8 +125,8 @@
 
     async function loadBorrows(reset = false) {
         const url = currentQuery
-            ? `/borrows/search?q=${encodeURIComponent(currentQuery)}&page=${page}&size=${size}`
-            : `/borrows/page?page=${page}&size=${size}`;
+            ? `/api/borrows/search?q=${encodeURIComponent(currentQuery)}&page=${page}&size=${size}`
+            : `/api/borrows/page?page=${page}&size=${size}`;
 
         const response = await fetch(url);
         const newBorrows = await response.json();
@@ -182,7 +182,7 @@
 
         if (!confirm("Удалить запись?")) return;
 
-        const response = await fetch(`/borrows/${id}`, { method: "DELETE" });
+        const response = await fetch(`/api/borrows/${id}`, { method: "DELETE" });
 
         if (response.ok) {
             // Удаляем строку из DOM

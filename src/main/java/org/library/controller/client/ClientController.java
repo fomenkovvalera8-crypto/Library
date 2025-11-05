@@ -1,5 +1,6 @@
-package org.library.controller;
+package org.library.controller.client;
 
+import lombok.RequiredArgsConstructor;
 import org.library.model.Client;
 import org.library.service.ClientService;
 import org.springframework.stereotype.Controller;
@@ -12,13 +13,14 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/clients")
+@RequiredArgsConstructor
 public class ClientController {
 
     private final ClientService clientService;
 
-    public ClientController(ClientService clientService) {
-        this.clientService = clientService;
-    }
+    private static final String VIEW_CLIENT = "clients";
+    private static final String VIEW_FORM = "clients-form";
+    private static final String REDIRECT_CLIENT = "redirect:/clients";
 
     @GetMapping
     public String listClients(@RequestParam(defaultValue = "0") int page,
@@ -32,66 +34,46 @@ public class ClientController {
         model.addAttribute("size", size);
         model.addAttribute("hasMore", (page + 1) * size < total);
 
-        return "clients";
-    }
-    @GetMapping("/page")
-    @ResponseBody
-    public List<Client> getClientsPage(@RequestParam(defaultValue = "0") int page,
-                                       @RequestParam(defaultValue = "10") int size) {
-        return clientService.getClientsPage(page, size);
+        return VIEW_CLIENT;
     }
 
     @GetMapping("/new")
     public String showAddForm(Model model) {
         model.addAttribute("client", new Client());
-        return "client-form";
+        return VIEW_FORM;
     }
 
     @PostMapping
     public String addClient(@ModelAttribute @Valid Client client, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return "client-form";
+            return VIEW_FORM;
         }
         clientService.saveClient(client);
-        return "redirect:/clients";
+        return REDIRECT_CLIENT;
     }
 
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
         Client client = clientService.getClientById(id).orElseThrow(() -> new RuntimeException("Client not found"));
         model.addAttribute("client", client);
-        return "client-form";
+        return VIEW_FORM;
     }
 
     @PostMapping("/update/{id}")
     public String updateClient(@PathVariable Long id, @ModelAttribute @Valid Client client, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             client.setId(id);
-            return "client-form";
+            return VIEW_FORM;
         }
 
         clientService.updateClient(id, client);
-        return "redirect:/clients";
-    }
-
-    @DeleteMapping("/{id}")
-    @ResponseBody
-    public void deleteClientAjax(@PathVariable Long id) {
-        clientService.deleteClient(id);
+        return REDIRECT_CLIENT;
     }
 
     @GetMapping("/delete/{id}")
     public String deleteClient(@PathVariable Long id) {
         clientService.deleteClient(id);
-        return "redirect:/clients";
+        return REDIRECT_CLIENT;
     }
 
-    @GetMapping("/search")
-    @ResponseBody
-    public List<Client> searchClients(
-            @RequestParam("q") String query,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return clientService.searchByNamePaged(query, page, size);
-    }
 }

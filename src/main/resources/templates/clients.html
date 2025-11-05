@@ -122,8 +122,8 @@
 
     async function loadClients(reset = false) {
         const url = currentQuery
-            ? `/clients/search?q=${encodeURIComponent(currentQuery)}&page=${page}&size=${size}`
-            : `/clients/page?page=${page}&size=${size}`;
+            ? `/api/clients/search?q=${encodeURIComponent(currentQuery)}&page=${page}&size=${size}`
+            : `/api/clients/page?page=${page}&size=${size}`;
 
         const response = await fetch(url);
         const newClients = await response.json();
@@ -170,7 +170,7 @@
 
         if (!confirm("Удалить клиента?")) return;
 
-        const response = await fetch(`/clients/${id}`, { method: "DELETE" });
+        const response = await fetch(`/api/clients/${id}`, { method: "DELETE" });
 
         if (response.ok) {
             link.closest("tr").remove();
