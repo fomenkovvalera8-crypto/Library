@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.library.dto.PageDTO;
 import org.library.model.Book;
 import org.library.repository.BookRepository;
+import org.library.service.abstraction.PaginationService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @RequiredArgsConstructor
-public class BookPaginationService {
+public class BookPaginationService implements PaginationService<Book> {
 
     private final BookRepository bookRepository;
 
@@ -23,7 +24,7 @@ public class BookPaginationService {
      * @param size количество элементов на странице
      * @return объект PageDTO с книгами, информацией о следующей странице и параметрами запроса
      */
-    public PageDTO<Book> getBooksPage(int page, int size) {
+    public PageDTO<Book> getPage(int page, int size) {
         Page<Book> booksPage = bookRepository.findAll(PageRequest.of(page, size));
         boolean hasMore = booksPage.hasNext();
         return new PageDTO<>(booksPage.getContent(), hasMore, page, size);

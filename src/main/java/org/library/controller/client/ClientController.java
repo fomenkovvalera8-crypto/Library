@@ -36,7 +36,7 @@ public class ClientController {
     public String listClients(@RequestParam(defaultValue = "0") int page,
                               @RequestParam(defaultValue = "10") int size,
                               Model model) {
-        PageDTO<Client> clientPage = clientPaginationService.getClientsPage(page, size);
+        PageDTO<Client> clientPage = clientPaginationService.getPage(page, size);
 
         model.addAttribute("clients", clientPage.getContent());
         model.addAttribute("hasMore", clientPage.isHasMore());
@@ -68,7 +68,7 @@ public class ClientController {
         if (bindingResult.hasErrors()) {
             return VIEW_FORM;
         }
-        clientCRUDService.saveOrUpdateClient(client, null);
+        clientCRUDService.saveOrUpdate(client, null);
         return REDIRECT_CLIENT;
     }
 
@@ -81,7 +81,7 @@ public class ClientController {
      */
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
-        Client client = clientCRUDService.getClientById(id).orElseThrow(() -> new ClientNotFoundException(id));
+        Client client = clientCRUDService.getById(id).orElseThrow(() -> new ClientNotFoundException(id));
         model.addAttribute("client", client);
         return VIEW_FORM;
     }
@@ -100,7 +100,7 @@ public class ClientController {
             return VIEW_FORM;
         }
 
-        clientCRUDService.saveOrUpdateClient(client, id);
+        clientCRUDService.saveOrUpdate(client, id);
         return REDIRECT_CLIENT;
     }
 
@@ -112,7 +112,7 @@ public class ClientController {
      */
     @GetMapping("/delete/{id}")
     public String deleteClient(@PathVariable Long id) {
-        clientCRUDService.deleteClient(id);
+        clientCRUDService.delete(id);
         return REDIRECT_CLIENT;
     }
 

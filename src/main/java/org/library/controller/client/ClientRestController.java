@@ -34,10 +34,10 @@ public class ClientRestController {
             @RequestParam(defaultValue = "10") int size) {
 
         if (query == null || query.trim().isEmpty()) {
-            return clientPaginationService.getClientsPage(page, size);
+            return clientPaginationService.getPage(page, size);
         }
-        List<Client> clients = clientSearchService.searchByNamePaged(query, page, size);
-        long total = clientSearchService.countSearchResults(query);
+        List<Client> clients = clientSearchService.search(query, page, size);
+        long total = clientSearchService.count(query);
         boolean hasMore = (page + 1) * size < total;
 
         return new PageDTO<>(clients, hasMore, page, size);
@@ -49,7 +49,7 @@ public class ClientRestController {
      */
     @DeleteMapping("/{id}")
     public void deleteClientAjax(@PathVariable Long id) {
-        clientCRUDService.deleteClient(id);
+        clientCRUDService.delete(id);
     }
 
     /**
@@ -61,6 +61,6 @@ public class ClientRestController {
     @GetMapping("/page")
     public PageDTO<Client> getClientsPage(@RequestParam(defaultValue = "0") int page,
                                           @RequestParam(defaultValue = "10") int size) {
-        return clientPaginationService.getClientsPage(page, size);
+        return clientPaginationService.getPage(page, size);
     }
 }

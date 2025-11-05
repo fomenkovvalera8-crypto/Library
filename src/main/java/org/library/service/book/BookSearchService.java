@@ -3,6 +3,7 @@ package org.library.service.book;
 import lombok.RequiredArgsConstructor;
 import org.library.model.Book;
 import org.library.repository.BookRepository;
+import org.library.service.abstraction.SearchService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -15,7 +16,7 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
-public class BookSearchService {
+public class BookSearchService implements SearchService<Book> {
 
     private final BookRepository bookRepository;
 
@@ -26,7 +27,7 @@ public class BookSearchService {
      * @param size количество элементов на странице
      * @return список книг, соответствующих запросу
      */
-    public List<Book> searchBooks(String query, int page, int size) {
+    public List<Book> search(String query, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
         return bookRepository
                 .findByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCaseOrIsbnContainingIgnoreCase(query, query, query, pageable)
@@ -38,7 +39,7 @@ public class BookSearchService {
      * @param query поисковая строка
      * @return количество книг
      */
-    public long countSearchResults(String query) {
+    public long count(String query) {
         Pageable singleItem = PageRequest.of(0, 1);
         return bookRepository
                 .findByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCaseOrIsbnContainingIgnoreCase(query, query, query, singleItem)

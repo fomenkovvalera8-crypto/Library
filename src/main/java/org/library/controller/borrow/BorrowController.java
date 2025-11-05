@@ -45,7 +45,7 @@ public class BorrowController {
                               @RequestParam(defaultValue = "0") int page,
                               @RequestParam(defaultValue = "10") int size) {
 
-        PageDTO<Borrow> borrowPage = borrowPaginationService.getBorrowsPage(page, size);
+        PageDTO<Borrow> borrowPage = borrowPaginationService.getPage(page, size);
 
         model.addAttribute("borrows", borrowPage.getContent());
         model.addAttribute("hasMore", borrowPage.isHasMore());
@@ -77,7 +77,7 @@ public class BorrowController {
     @PostMapping
     public String addBorrow(@ModelAttribute Borrow borrow) {
         validateBorrowEntities(borrow);
-        borrowCRUDService.saveOrUpdateBorrow(borrow, null);
+        borrowCRUDService.saveOrUpdate(borrow, null);
         return REDIRECT_BORROWS;
     }
 
@@ -90,7 +90,7 @@ public class BorrowController {
      */
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
-        Borrow borrow = borrowCRUDService.getBorrowById(id)
+        Borrow borrow = borrowCRUDService.getById(id)
                 .orElseThrow(() -> new BorrowNotFoundException(id));
         model.addAttribute("borrow", borrow);
         model.addAttribute("books", bookSearchService.getAllBooks());
@@ -108,7 +108,7 @@ public class BorrowController {
     @PostMapping("/update/{id}")
     public String updateBorrow(@PathVariable Long id, @ModelAttribute Borrow borrow) {
         validateBorrowEntities(borrow);
-        borrowCRUDService.saveOrUpdateBorrow(borrow, id);
+        borrowCRUDService.saveOrUpdate(borrow, id);
         return REDIRECT_BORROWS;
     }
 
@@ -119,7 +119,7 @@ public class BorrowController {
      */
     @GetMapping("/delete/{id}")
     public String deleteBorrow(@PathVariable Long id) {
-        borrowCRUDService.deleteBorrow(id);
+        borrowCRUDService.delete(id);
         return REDIRECT_BORROWS;
     }
 
@@ -129,10 +129,10 @@ public class BorrowController {
      * @throws IllegalArgumentException если клиент или книга не найдены в базе
      */
     private void validateBorrowEntities(@ModelAttribute Borrow borrow) {
-        if (borrow.getClient() == null || !clientCRUDService.getClientById(borrow.getClient().getId()).isPresent()) {
+        if (borrow.getClient() == null || !clientCRUDService.getById(borrow.getClient().getId()).isPresent()) {
             throw new IllegalArgumentException("Клиент не найден");
         }
-        if (borrow.getBook() == null || !bookCRUDService.getBookById(borrow.getBook().getId()).isPresent()) {
+        if (borrow.getBook() == null || !bookCRUDService.getById(borrow.getBook().getId()).isPresent()) {
             throw new IllegalArgumentException("Книга не найдена");
         }
     }

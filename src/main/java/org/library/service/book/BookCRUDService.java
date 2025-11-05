@@ -3,6 +3,7 @@ package org.library.service.book;
 import lombok.RequiredArgsConstructor;
 import org.library.model.Book;
 import org.library.repository.BookRepository;
+import org.library.service.abstraction.CRUDService;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -12,7 +13,7 @@ import java.util.Optional;
  */
 @Service
 @RequiredArgsConstructor
-public class BookCRUDService {
+public class BookCRUDService implements CRUDService<Book> {
 
     private final BookRepository bookRepository;
 
@@ -21,7 +22,7 @@ public class BookCRUDService {
      * @param id идентификатор книги
      * @return Optional с найденной книгой или пустой, если книга не найдена
      */
-    public Optional<Book> getBookById(Long id) {
+    public Optional<Book> getById(Long id) {
         return bookRepository.findById(id);
     }
 
@@ -29,7 +30,7 @@ public class BookCRUDService {
      * Удаляет книгу по идентификатору.
      * @param id идентификатор книги для удаления
      */
-    public void deleteBook(Long id) {
+    public void delete(Long id) {
         bookRepository.deleteById(id);
     }
 

@@ -27,7 +27,7 @@ public class BookRestController {
     @GetMapping("/page")
     public PageDTO<Book> getBooksPage(@RequestParam(defaultValue = "0") int page,
                                         @RequestParam(defaultValue = "10") int size) {
-        return bookPaginationService.getBooksPage(page, size);
+        return bookPaginationService.getPage(page, size);
     }
 
     /**
@@ -42,8 +42,8 @@ public class BookRestController {
     public PageDTO<Book>  searchBooks(@RequestParam("q") String query,
                                    @RequestParam(defaultValue = "0") int page,
                                    @RequestParam(defaultValue = "10") int size) {
-        List<Book> books = bookSearchService.searchBooks(query, page, size);
-        long total = bookSearchService.countSearchResults(query);
+        List<Book> books = bookSearchService.search(query, page, size);
+        long total = bookSearchService.count(query);
         boolean hasMore = (page + 1) * size < total;
 
         return new PageDTO<>(books, hasMore, page, size);
@@ -56,7 +56,7 @@ public class BookRestController {
      */
     @GetMapping("/search/count")
     public long countSearchResults(@RequestParam("q") String query) {
-        return bookSearchService.countSearchResults(query);
+        return bookSearchService.count(query);
     }
 
     /**
@@ -65,6 +65,6 @@ public class BookRestController {
      */
     @DeleteMapping("/{id}")
     public void deleteBook(@PathVariable Long id) {
-        bookCRUDService.deleteBook(id);
+        bookCRUDService.delete(id);
     }
 }

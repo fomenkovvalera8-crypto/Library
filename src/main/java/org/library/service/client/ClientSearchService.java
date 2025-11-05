@@ -3,6 +3,7 @@ package org.library.service.client;
 import lombok.RequiredArgsConstructor;
 import org.library.model.Client;
 import org.library.repository.ClientRepository;
+import org.library.service.abstraction.SearchService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -15,7 +16,7 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
-public class ClientSearchService {
+public class ClientSearchService implements SearchService<Client> {
     private final ClientRepository clientRepository;
 
     /**
@@ -25,7 +26,7 @@ public class ClientSearchService {
      * @param size количество элементов на странице
      * @return список клиентов, соответствующих запросу
      */
-    public List<Client> searchByNamePaged(String query, int page, int size) {
+    public List<Client> search(String query, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
         return clientRepository.searchAllColumns(query, pageable).getContent();
     }
@@ -35,7 +36,7 @@ public class ClientSearchService {
      * @param query поисковая строка
      * @return количество клиентов
      */
-    public long countSearchResults(String query) {
+    public long count(String query) {
         Pageable singleItem = PageRequest.of(0, 1);
         return clientRepository
                 .searchAllColumns(query, singleItem)

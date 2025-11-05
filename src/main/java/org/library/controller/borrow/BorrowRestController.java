@@ -48,7 +48,7 @@ public class BorrowRestController {
      */
     @DeleteMapping("/{id}")
     public void deleteBorrowAjax(@PathVariable Long id) {
-        borrowCRUDService.deleteBorrow(id);
+        borrowCRUDService.delete(id);
     }
 
     /**
@@ -60,7 +60,7 @@ public class BorrowRestController {
     @GetMapping("/page")
     public PageDTO<Borrow> getBorrowsPage(@RequestParam(defaultValue = "0") int page,
                                        @RequestParam(defaultValue = "10") int size) {
-        return borrowPaginationService.getBorrowsPage(page, size);
+        return borrowPaginationService.getPage(page, size);
     }
 
     /**
@@ -75,11 +75,11 @@ public class BorrowRestController {
                                  @RequestParam(defaultValue = "0") int page,
                                  @RequestParam(defaultValue = "10") int size) {
         if (query == null || query.trim().isEmpty()) {
-            return borrowPaginationService.getBorrowsPage(page, size);
+            return borrowPaginationService.getPage(page, size);
         }
 
-        List<Borrow> borrows = borrowSearchService.searchBorrows(query, page, size);
-        long total = borrowSearchService.countSearchResults(query);
+        List<Borrow> borrows = borrowSearchService.search(query, page, size);
+        long total = borrowSearchService.count(query);
         boolean hasMore = (page + 1) * size < total;
 
         return new PageDTO<>(borrows, hasMore, page, size);

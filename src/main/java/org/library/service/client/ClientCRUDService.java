@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.library.exception.ClientNotFoundException;
 import org.library.model.Client;
 import org.library.repository.ClientRepository;
+import org.library.service.abstraction.CRUDService;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -13,7 +14,7 @@ import java.util.Optional;
  */
 @Service
 @RequiredArgsConstructor
-public class ClientCRUDService {
+public class ClientCRUDService implements CRUDService<Client> {
 
     private final ClientRepository clientRepository;
 
@@ -22,7 +23,7 @@ public class ClientCRUDService {
      * @param id идентификатор клиента
      * @return Optional с найденным клиентом или пустой, если не найден
      */
-    public Optional<Client> getClientById(Long id) {
+    public Optional<Client> getById(Long id) {
         return clientRepository.findById(id);
     }
 
@@ -30,7 +31,7 @@ public class ClientCRUDService {
      * Удаление клиента по ID.
      * @param id идентификатор клиента
      */
-    public void deleteClient(Long id) {
+    public void delete(Long id) {
         clientRepository.deleteById(id);
     }
 
@@ -39,7 +40,7 @@ public class ClientCRUDService {
      * @param client объект клиента с актуальными данными
      * @param id идентификатор клиента для обновления (null для создания)
      */
-    public void saveOrUpdateClient(Client client, Long id) {
+    public void saveOrUpdate(Client client, Long id) {
         if (id == null) {
             clientRepository.save(client);
         } else {

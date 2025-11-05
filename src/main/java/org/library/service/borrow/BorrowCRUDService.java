@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.library.exception.BorrowNotFoundException;
 import org.library.model.Borrow;
 import org.library.repository.BorrowRepository;
+import org.library.service.abstraction.CRUDService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.Optional;
  */
 @Service
 @RequiredArgsConstructor
-public class BorrowCRUDService {
+public class BorrowCRUDService implements CRUDService<Borrow> {
 
     private final BorrowRepository borrowRepository;
 
@@ -31,7 +32,7 @@ public class BorrowCRUDService {
      * @param id идентификатор borrow
      * @return Optional с найденной записью или пустой, если не найдено
      */
-    public Optional<Borrow> getBorrowById(Long id) {
+    public Optional<Borrow> getById(Long id) {
         return borrowRepository.findById(id);
     }
 
@@ -39,7 +40,7 @@ public class BorrowCRUDService {
      * Удаление записи о взятой книге по идентификатору.
      * @param id идентификатор borrow
      */
-    public void deleteBorrow(Long id) {
+    public void delete(Long id) {
         borrowRepository.deleteById(id);
     }
 
@@ -48,7 +49,7 @@ public class BorrowCRUDService {
      * @param borrow объект borrow с данными
      * @param id идентификатор для обновления или null для создания
      */
-    public void saveOrUpdateBorrow(Borrow borrow, Long id) {
+    public void saveOrUpdate(Borrow borrow, Long id) {
         if (id == null) {
             borrowRepository.save(borrow);
         } else {

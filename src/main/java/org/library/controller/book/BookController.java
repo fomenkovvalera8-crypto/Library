@@ -36,7 +36,7 @@ public class BookController {
     public String listBooks(Model model,
                             @RequestParam(defaultValue = "0") int page,
                             @RequestParam(defaultValue = "10") int size) {
-        PageDTO<Book> bookPage = bookPaginationService.getBooksPage(page, size);
+        PageDTO<Book> bookPage = bookPaginationService.getPage(page, size);
         model.addAttribute("books", bookPage.getContent());
         model.addAttribute("hasMore", bookPage.isHasMore());
         model.addAttribute("page", bookPage.getPage());
@@ -63,7 +63,7 @@ public class BookController {
      */
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
-        Book book = bookCRUDService.getBookById(id)
+        Book book = bookCRUDService.getById(id)
                 .orElseThrow(() -> new BookNotFoundException(id));
         model.addAttribute("book", book);
         return BOOK_FORM;
@@ -103,7 +103,7 @@ public class BookController {
      */
     @GetMapping("/delete/{id}")
     public String deleteBook(@PathVariable Long id) {
-        bookCRUDService.deleteBook(id);
+        bookCRUDService.delete(id);
         return REDIRECT_BOOKS;
     }
 
