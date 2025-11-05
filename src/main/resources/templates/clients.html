@@ -126,7 +126,8 @@
             : `/api/clients/page?page=${page}&size=${size}`;
 
         const response = await fetch(url);
-        const newClients = await response.json();
+        const data = await response.json();
+        const newClients = data.content;
 
         if (reset) tbody.innerHTML = "";
 
@@ -141,7 +142,7 @@
             tbody.appendChild(row);
         });
 
-        if (newClients.length < size) loadMoreBtn.style.display = "none";
+        if (!data.hasMore || newClients.length === 0) loadMoreBtn.style.display = "none";
         else loadMoreBtn.style.display = "block";
     }
 

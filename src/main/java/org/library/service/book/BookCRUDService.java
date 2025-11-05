@@ -1,25 +1,34 @@
 package org.library.service.book;
 
+import lombok.RequiredArgsConstructor;
 import org.library.model.Book;
 import org.library.repository.BookRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
+/**
+ * Сервис для выполнения CRUD-операций с сущностью Book
+ */
 @Service
+@RequiredArgsConstructor
 public class BookCRUDService {
 
     private final BookRepository bookRepository;
 
-    public BookCRUDService(BookRepository bookRepository) {
-        this.bookRepository = bookRepository;
-    }
-
+    /**
+     * Получает книгу по её идентификатору
+     * @param id идентификатор книги
+     * @return Optional с найденной книгой или пустой, если книга не найдена
+     */
     public Optional<Book> getBookById(Long id) {
         return bookRepository.findById(id);
     }
 
+    /**
+     * Удаляет книгу по идентификатору.
+     * @param id идентификатор книги для удаления
+     */
     public void deleteBook(Long id) {
         bookRepository.deleteById(id);
     }

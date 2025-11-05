@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Сервис для поиска книг с поддержкой пагинации и сортировки
+ */
 @Service
 @RequiredArgsConstructor
 public class BookSearchService {
@@ -42,6 +45,10 @@ public class BookSearchService {
                 .getTotalElements();
     }
 
+    /**
+     * Получение всех книг без фильтров
+     * @return список всех книг
+     */
     public List<Book> getAllBooks() {
         return bookRepository.findAll();
     }

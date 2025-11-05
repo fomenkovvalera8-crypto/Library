@@ -6,9 +6,10 @@ import org.library.exception.BorrowNotFoundException;
 import org.library.model.Borrow;
 import org.library.service.borrow.BorrowPaginationService;
 import org.library.service.borrow.BorrowCRUDService;
-import org.library.service.ClientService;
+import org.library.service.client.ClientCRUDService;
 import org.library.service.book.BookCRUDService;
 import org.library.service.book.BookSearchService;
+import org.library.service.client.ClientSearchService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,8 @@ public class BorrowController {
     private final BorrowPaginationService borrowPaginationService;
     private final BookCRUDService bookCRUDService;
     private final BookSearchService bookSearchService;
-    private final ClientService clientService;
+    private final ClientCRUDService clientCRUDService;
+    private final ClientSearchService clientSearchService;
 
     private static final String VIEW_BORROWS = "borrows";
     private static final String VIEW_FORM = "borrow-form";
@@ -62,7 +64,7 @@ public class BorrowController {
     public String showAddForm(Model model) {
         model.addAttribute("borrow", new Borrow());
         model.addAttribute("books", bookSearchService.getAllBooks());
-        model.addAttribute("clients", clientService.getAllClients());
+        model.addAttribute("clients", clientSearchService.getAllClients());
         return VIEW_FORM;
     }
 
@@ -75,7 +77,7 @@ public class BorrowController {
     @PostMapping
     public String addBorrow(@ModelAttribute Borrow borrow) {
         validateBorrowEntities(borrow);
-        borrowCRUDService.saveBorrow(borrow);
+        borrowCRUDService.saveOrUpdateBorrow(borrow, null);
         return REDIRECT_BORROWS;
     }
 
@@ -92,7 +94,7 @@ public class BorrowController {
                 .orElseThrow(() -> new BorrowNotFoundException(id));
         model.addAttribute("borrow", borrow);
         model.addAttribute("books", bookSearchService.getAllBooks());
-        model.addAttribute("clients", clientService.getAllClients());
+        model.addAttribute("clients", clientSearchService.getAllClients());
         return VIEW_FORM;
     }
 
@@ -106,7 +108,7 @@ public class BorrowController {
     @PostMapping("/update/{id}")
     public String updateBorrow(@PathVariable Long id, @ModelAttribute Borrow borrow) {
         validateBorrowEntities(borrow);
-        borrowCRUDService.updateBorrow(id, borrow);
+        borrowCRUDService.saveOrUpdateBorrow(borrow, id);
         return REDIRECT_BORROWS;
     }
 
@@ -127,7 +129,7 @@ public class BorrowController {
      * @throws IllegalArgumentException если клиент или книга не найдены в базе
      */
     private void validateBorrowEntities(@ModelAttribute Borrow borrow) {
-        if (borrow.getClient() == null || !clientService.getClientById(borrow.getClient().getId()).isPresent()) {
+        if (borrow.getClient() == null || !clientCRUDService.getClientById(borrow.getClient().getId()).isPresent()) {
             throw new IllegalArgumentException("Клиент не найден");
         }
         if (borrow.getBook() == null || !bookCRUDService.getBookById(borrow.getBook().getId()).isPresent()) {
