@@ -1,7 +1,7 @@
 package org.library.controller.book;
 
 import lombok.RequiredArgsConstructor;
-import org.library.dto.BookPageDTO;
+import org.library.dto.PageDTO;
 import org.library.exception.BookNotFoundException;
 import org.library.model.Book;
 import org.library.service.book.BookPaginationService;
@@ -36,8 +36,8 @@ public class BookController {
     public String listBooks(Model model,
                             @RequestParam(defaultValue = "0") int page,
                             @RequestParam(defaultValue = "10") int size) {
-        BookPageDTO bookPage = bookPaginationService.getBooksPage(page, size);
-        model.addAttribute("books", bookPage.getBooks());
+        PageDTO<Book> bookPage = bookPaginationService.getBooksPage(page, size);
+        model.addAttribute("books", bookPage.getContent());
         model.addAttribute("hasMore", bookPage.isHasMore());
         model.addAttribute("page", bookPage.getPage());
         model.addAttribute("size", bookPage.getSize());

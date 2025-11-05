@@ -129,7 +129,10 @@
             : `/api/borrows/page?page=${page}&size=${size}`;
 
         const response = await fetch(url);
-        const newBorrows = await response.json();
+        const pageData = await response.json();
+
+        const newBorrows = pageData.content;
+        const hasMore = pageData.hasMore;
 
         if (reset) tbody.innerHTML = "";
 
@@ -157,8 +160,7 @@
             tbody.appendChild(row);
         });
 
-        if (newBorrows.length < size) loadMoreBtn.style.display = "none";
-        else loadMoreBtn.style.display = "block";
+        loadMoreBtn.style.display = hasMore ? "block" : "none";
     }
 
     loadMoreBtn?.addEventListener("click", () => {

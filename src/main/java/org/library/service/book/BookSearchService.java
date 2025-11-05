@@ -1,5 +1,6 @@
 package org.library.service.book;
 
+import lombok.RequiredArgsConstructor;
 import org.library.model.Book;
 import org.library.repository.BookRepository;
 import org.springframework.data.domain.PageRequest;
@@ -10,13 +11,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class BookSearchService {
 
     private final BookRepository bookRepository;
-
-    public BookSearchService(BookRepository bookRepository) {
-        this.bookRepository = bookRepository;
-    }
 
     /**
      * Поиск книг с пагинацией
@@ -42,5 +40,9 @@ public class BookSearchService {
         return bookRepository
                 .findByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCaseOrIsbnContainingIgnoreCase(query, query, query, singleItem)
                 .getTotalElements();
+    }
+
+    public List<Book> getAllBooks() {
+        return bookRepository.findAll();
     }
 }

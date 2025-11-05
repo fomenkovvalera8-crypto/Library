@@ -1,7 +1,7 @@
 package org.library.controller.book;
 
 import lombok.RequiredArgsConstructor;
-import org.library.dto.BookPageDTO;
+import org.library.dto.PageDTO;
 import org.library.model.Book;
 import org.library.service.book.BookCRUDService;
 import org.library.service.book.BookPaginationService;
@@ -25,8 +25,8 @@ public class BookRestController {
      * @return список книг на указанной странице
      */
     @GetMapping("/page")
-    public BookPageDTO getBooksPage(@RequestParam(defaultValue = "0") int page,
-                                    @RequestParam(defaultValue = "10") int size) {
+    public PageDTO<Book> getBooksPage(@RequestParam(defaultValue = "0") int page,
+                                        @RequestParam(defaultValue = "10") int size) {
         return bookPaginationService.getBooksPage(page, size);
     }
 
@@ -39,14 +39,14 @@ public class BookRestController {
      *         размером страницы - size
      */
     @GetMapping("/search")
-    public BookPageDTO searchBooks(@RequestParam("q") String query,
+    public PageDTO<Book>  searchBooks(@RequestParam("q") String query,
                                    @RequestParam(defaultValue = "0") int page,
                                    @RequestParam(defaultValue = "10") int size) {
         List<Book> books = bookSearchService.searchBooks(query, page, size);
         long total = bookSearchService.countSearchResults(query);
         boolean hasMore = (page + 1) * size < total;
 
-        return new BookPageDTO(books, hasMore, page, size);
+        return new PageDTO<>(books, hasMore, page, size);
     }
 
     /**

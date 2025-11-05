@@ -116,6 +116,10 @@
         }
 
         const response = await fetch(url);
+        if (!response.ok) {
+            console.error("Ошибка загрузки данных:", response.status);
+            return { content: [], hasMore: false };
+        }
         return await response.json();
     }
 
@@ -135,13 +139,13 @@
         });
     }
 
-    // Загрузка следующей страницы
+    // Кнопка "Показать ещё"
     if (loadMoreBtn) {
         loadMoreBtn.addEventListener("click", async () => {
             page++;
-            const newBooks = await loadBooks(page, currentQuery);
-            renderBooks(newBooks.books, true);
-            loadMoreBtn.style.display = newBooks.hasMore ? "inline-block" : "none";
+            const result = await loadBooks(page, currentQuery);
+            renderBooks(result.content, true);
+            loadMoreBtn.style.display = result.hasMore ? "inline-block" : "none";
         });
     }
 
@@ -153,9 +157,9 @@
             searchMode = false;
             currentQuery = "";
             page = 0;
-            const books = await loadBooks(page);
-            renderBooks(books.books);
-            loadMoreBtn.style.display = books.hasMore ? "inline-block" : "none";
+            const result = await loadBooks(page);
+            renderBooks(result.content);
+            loadMoreBtn.style.display = result.hasMore ? "inline-block" : "none";
             return;
         }
 
@@ -163,10 +167,12 @@
         currentQuery = query;
         page = 0;
 
-        const books = await loadBooks(page, query);
-        renderBooks(books.books);
-        loadMoreBtn.style.display = books.hasMore ? "inline-block" : "none";
+        const result = await loadBooks(page, query);
+        renderBooks(result.content);
+        loadMoreBtn.style.display = result.hasMore ? "inline-block" : "none";
     });
+
+    // Удаление книги
     tbody.addEventListener("click", async (e) => {
         const link = e.target.closest(".delete-link");
         if (!link) return;
@@ -179,11 +185,17 @@
         const response = await fetch(`/api/books/${id}`, { method: "DELETE" });
 
         if (response.ok) {
-            // Удаляем строку из DOM
             link.closest("tr").remove();
         } else {
             alert("Ошибка при удалении книги");
         }
+    });
+
+    // Первоначальная загрузка
+    document.addEventListener("DOMContentLoaded", async () => {
+        const result = await loadBooks(page);
+        renderBooks(result.content);
+        loadMoreBtn.style.display = result.hasMore ? "inline-block" : "none";
     });
 </script>
 

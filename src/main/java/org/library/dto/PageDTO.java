@@ -2,20 +2,19 @@ package org.library.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.library.model.Book;
 
 import java.util.List;
 
 @Getter
 @Setter
-public class BookPageDTO {
-    private List<Book> books;
+public class PageDTO<T> {
+    private List<T> content;
     private boolean hasMore;
     private int page;
     private int size;
 
-    public BookPageDTO(List<Book> books, boolean hasMore, int page, int size) {
-        this.books = books;
+    public PageDTO(List<T> content, boolean hasMore, int page, int size) {
+        this.content = content;
         this.hasMore = hasMore;
         this.page = page;
         this.size = size;
