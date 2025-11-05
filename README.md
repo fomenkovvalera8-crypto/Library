@@ -26,11 +26,11 @@ spring.datasource.password=<Пароль пользователя>
 mvn clean package
 
 После сборки будет создан JAR-файл в директории target/:
-target/library-0.0.1-SNAPSHOT.jar
+target/library.jar
 
 ### 3. Запуск приложения
 Запустите приложение с помощью java -jar из корня проекта:
-java -jar target/library-0.0.1-SNAPSHOT.jar
+java -jar target/library.jar
 
 Приложение будет доступно по адресу:
 http://localhost:8081
