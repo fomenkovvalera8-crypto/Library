@@ -19,7 +19,7 @@ public class ClientController {
     private final ClientService clientService;
 
     private static final String VIEW_CLIENT = "clients";
-    private static final String VIEW_FORM = "clients-form";
+    private static final String VIEW_FORM = "client-form";
     private static final String REDIRECT_CLIENT = "redirect:/clients";
 
     @GetMapping

@@ -85,12 +85,20 @@
         try {
             const res = await fetch(`${url}?q=${encodeURIComponent(query)}`);
             if (!res.ok) return [];
-            return res.json();
+
+            const data = await res.json();
+
+            if (data.books) return data.books;
+
+            if (Array.isArray(data)) return data;
+
+            return [];
         } catch (e) {
             console.error(e);
             return [];
         }
     }
+
 
     function setupAutocomplete(configs) {
         configs.forEach(cfg => {
@@ -151,28 +159,28 @@
             inputId: "clientSearch-new",
             suggestionsId: "clientSuggestions-new",
             hiddenId: "clientId-new",
-            apiUrl: "/clients/search",
+            apiUrl: "/api/clients/search",
             formatter: c => `${c.fullName} (${c.birthDate})`
         },
         {
             inputId: "bookSearch-new",
             suggestionsId: "bookSuggestions-new",
             hiddenId: "bookId-new",
-            apiUrl: "/books/search",
+            apiUrl: "/api/books/search",
             formatter: b => `${b.title} — ${b.author}`
         },
         {
             inputId: "clientSearch-edit",
             suggestionsId: "clientSuggestions-edit",
             hiddenId: "clientId-edit",
-            apiUrl: "/clients/search",
+            apiUrl: "/api/clients/search",
             formatter: c => `${c.fullName} (${c.birthDate})`
         },
         {
             inputId: "bookSearch-edit",
             suggestionsId: "bookSuggestions-edit",
             hiddenId: "bookId-edit",
-            apiUrl: "/books/search",
+            apiUrl: "/api/books/search",
             formatter: b => `${b.title} — ${b.author}`
         }
     ]);
