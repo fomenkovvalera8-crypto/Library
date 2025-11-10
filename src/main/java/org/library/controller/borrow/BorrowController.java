@@ -113,17 +113,6 @@ public class BorrowController {
     }
 
     /**
-     * Удаляет запись о выдаче по идентификатору
-     * @param id идентификатор удаляемой выдачи
-     * @return перенаправление на список выдач
-     */
-    @GetMapping("/delete/{id}")
-    public String deleteBorrow(@PathVariable Long id) {
-        borrowCRUDService.delete(id);
-        return REDIRECT_BORROWS;
-    }
-
-    /**
      * Проверяет корректность связанных сущностей перед сохранением или обновлением выдачи
      * @param borrow объект выдачи для проверки
      * @throws IllegalArgumentException если клиент или книга не найдены в базе

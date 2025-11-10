@@ -30,7 +30,7 @@
         <td th:text="${book.title}">Название книги</td>
         <td th:text="${book.author}">Автор</td>
         <td th:text="${book.isbn}">ISBN</td>
-        <td><a th:href="@{/books/delete/{id}(id=${book.id})}" title="Удалить" class="icon-link" onclick="return confirm('Удалить книгу?');">❌</a></td>
+        <td><a href="#" class="delete-link" data-id="${book.id}" title="Удалить">❌</a></td>
     </tr>
     </tbody>
 </table>

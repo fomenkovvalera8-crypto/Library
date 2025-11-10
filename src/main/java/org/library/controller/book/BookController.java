@@ -97,17 +97,6 @@ public class BookController {
     }
 
     /**
-     * Удаление книги
-     * @param id идентификатор удаляемой книги, извлекаемый из URL с помощью аннотации
-     * @return перенаправление на страницу с книгами после удаления
-     */
-    @GetMapping("/delete/{id}")
-    public String deleteBook(@PathVariable Long id) {
-        bookCRUDService.delete(id);
-        return REDIRECT_BOOKS;
-    }
-
-    /**
      * Сохранение книги
      * @param id идентификатор обновляемой книги, извлекаемый из URL с помощью аннотации
      * @param book объект книги, заполненный данными из HTML-формы book-form.html

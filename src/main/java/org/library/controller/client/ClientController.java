@@ -103,17 +103,4 @@ public class ClientController {
         clientCRUDService.saveOrUpdate(client, id);
         return REDIRECT_CLIENT;
     }
-
-
-    /**
-     * Удаляет клиента по указанному идентификатору
-     * @param id идентификатор клиента для удаления
-     * @return перенаправление на страницу с клиентами
-     */
-    @GetMapping("/delete/{id}")
-    public String deleteClient(@PathVariable Long id) {
-        clientCRUDService.delete(id);
-        return REDIRECT_CLIENT;
-    }
-
 }
