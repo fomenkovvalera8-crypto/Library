@@ -1,9 +1,11 @@
 package org.library.service.book;
 
 import lombok.RequiredArgsConstructor;
+import org.library.exception.BookNotFoundException;
 import org.library.model.Book;
 import org.library.repository.BookRepository;
 import org.library.service.abstraction.CRUDService;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -13,45 +15,30 @@ import java.util.Optional;
  */
 @Service
 @RequiredArgsConstructor
-public class BookCRUDService implements CRUDService<Book> {
+public class BookCRUDService implements CRUDService<Book, Long> {
 
     private final BookRepository bookRepository;
 
     /**
-     * Получает книгу по её идентификатору
-     * @param id идентификатор книги
-     * @return Optional с найденной книгой или пустой, если книга не найдена
+     * Получение репозитория для работы с книгами
+     * @return репозиторий
      */
-    public Optional<Book> getById(Long id) {
-        return bookRepository.findById(id);
+    @Override
+    public JpaRepository<Book, Long> getRepository() {
+        return bookRepository;
     }
 
     /**
-     * Удаляет книгу по идентификатору.
-     * @param id идентификатор книги для удаления
+     * Метод обновления используемый при маппинге
+     * @param existing существующая сущность из базы данных
+     * @param incoming объект с обновлёнными данными
+     * @return сущность после обновления, готовая к сохранению
      */
-    public void delete(Long id) {
-        bookRepository.deleteById(id);
+    @Override
+    public Book updateEntity(Book existing, Book incoming) {
+        existing.setTitle(incoming.getTitle());
+        existing.setAuthor(incoming.getAuthor());
+        existing.setIsbn(incoming.getIsbn());
+        return bookRepository.save(existing);
     }
-
-    /**
-     * Создание или обновление книги
-     * @param book объект книги
-     * @param id если null — создаём новую книгу, иначе обновляем существующую
-     */
-    public void saveOrUpdate(Book book, Long id) {
-        if (id == null) {
-            bookRepository.save(book);
-        } else {
-            bookRepository.findById(id)
-                    .map(existingBook -> {
-                        existingBook.setTitle(book.getTitle());
-                        existingBook.setAuthor(book.getAuthor());
-                        existingBook.setIsbn(book.getIsbn());
-                        return bookRepository.save(existingBook);
-                    })
-                    .orElseThrow(() -> new RuntimeException("Книга с id " + id + " не найдена"));
-        }
-    }
-
 }

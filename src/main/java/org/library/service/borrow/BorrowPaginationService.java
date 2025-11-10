@@ -7,6 +7,7 @@ import org.library.repository.BorrowRepository;
 import org.library.service.abstraction.PaginationService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 /**
@@ -18,15 +19,8 @@ public class BorrowPaginationService implements PaginationService<Borrow> {
 
     private final BorrowRepository borrowRepository;
 
-    /**
-     * Получение страницы записей о взятых книгах
-     * @param page номер страницы
-     * @param size количество элементов на странице
-     * @return PageDTO с содержимым страницы, информацией о наличии следующей страницы,
-     *         текущей страницей и размером страницы
-     */
-    public PageDTO<Borrow> getPage(int page, int size) {
-        Page<Borrow> p = borrowRepository.findAll(PageRequest.of(page, size));
-        return new PageDTO<>(p.getContent(), p.hasNext(), page, size);
+    @Override
+    public JpaRepository<Borrow, Long> getRepository() {
+        return borrowRepository;
     }
 }

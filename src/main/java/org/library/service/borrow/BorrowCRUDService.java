@@ -5,6 +5,7 @@ import org.library.exception.BorrowNotFoundException;
 import org.library.model.Borrow;
 import org.library.repository.BorrowRepository;
 import org.library.service.abstraction.CRUDService;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.Optional;
  */
 @Service
 @RequiredArgsConstructor
-public class BorrowCRUDService implements CRUDService<Borrow> {
+public class BorrowCRUDService implements CRUDService<Borrow, Long> {
 
     private final BorrowRepository borrowRepository;
 
@@ -28,40 +29,24 @@ public class BorrowCRUDService implements CRUDService<Borrow> {
     }
 
     /**
-     * Получение конкретной записи по её идентификатору
-     * @param id идентификатор borrow
-     * @return Optional с найденной записью или пустой, если не найдено
+     * Возвращает репозиторий, связанный с сущностью Borrow
      */
-    public Optional<Borrow> getById(Long id) {
-        return borrowRepository.findById(id);
+    @Override
+    public JpaRepository<Borrow, Long> getRepository() {
+        return borrowRepository;
     }
 
     /**
-     * Удаление записи о взятой книге по идентификатору.
-     * @param id идентификатор borrow
+     * Обновляет существующую запись Borrow данными из incoming
+     * @param existing существующая запись Borrow из базы
+     * @param incoming объект с новыми данными
+     * @return обновлённая сущность, готовая к сохранению
      */
-    public void delete(Long id) {
-        borrowRepository.deleteById(id);
+    @Override
+    public Borrow updateEntity(Borrow existing, Borrow incoming) {
+        existing.setClient(incoming.getClient());
+        existing.setBook(incoming.getBook());
+        existing.setBorrowDate(incoming.getBorrowDate());
+        return borrowRepository.save(existing);
     }
-
-    /**
-     * Создание новой записи о взятой книге или обновление существующей
-     * @param borrow объект borrow с данными
-     * @param id идентификатор для обновления или null для создания
-     */
-    public void saveOrUpdate(Borrow borrow, Long id) {
-        if (id == null) {
-            borrowRepository.save(borrow);
-        } else {
-            borrowRepository.findById(id)
-                    .map(existingBorrow -> {
-                        existingBorrow.setClient(borrow.getClient());
-                        existingBorrow.setBook(borrow.getBook());
-                        existingBorrow.setBorrowDate(borrow.getBorrowDate());
-                        return borrowRepository.save(existingBorrow);
-                    })
-                    .orElseThrow(() -> new BorrowNotFoundException(id));
-        }
-    }
-
 }

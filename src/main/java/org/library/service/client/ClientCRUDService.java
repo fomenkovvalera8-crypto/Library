@@ -5,6 +5,7 @@ import org.library.exception.ClientNotFoundException;
 import org.library.model.Client;
 import org.library.repository.ClientRepository;
 import org.library.service.abstraction.CRUDService;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -14,43 +15,28 @@ import java.util.Optional;
  */
 @Service
 @RequiredArgsConstructor
-public class ClientCRUDService implements CRUDService<Client> {
+public class ClientCRUDService implements CRUDService<Client, Long> {
 
     private final ClientRepository clientRepository;
 
     /**
-     * Получение клиента по ID
-     * @param id идентификатор клиента
-     * @return Optional с найденным клиентом или пустой, если не найден
+     * Возвращает репозиторий, связанный с сущностью Client
      */
-    public Optional<Client> getById(Long id) {
-        return clientRepository.findById(id);
+    @Override
+    public JpaRepository<Client, Long> getRepository() {
+        return clientRepository;
     }
 
     /**
-     * Удаление клиента по ID.
-     * @param id идентификатор клиента
+     * Обновляет данные клиента, используя новые значения из incoming
+     * @param existing существующий клиент из базы данных
+     * @param incoming клиент с обновлёнными данными
+     * @return обновлённая сущность клиента
      */
-    public void delete(Long id) {
-        clientRepository.deleteById(id);
-    }
-
-    /**
-     * Создание нового клиента или обновление существующего
-     * @param client объект клиента с актуальными данными
-     * @param id идентификатор клиента для обновления (null для создания)
-     */
-    public void saveOrUpdate(Client client, Long id) {
-        if (id == null) {
-            clientRepository.save(client);
-        } else {
-            clientRepository.findById(id)
-                    .map(existingClient -> {
-                        existingClient.setFullName(client.getFullName());
-                        existingClient.setBirthDate(client.getBirthDate());
-                        return clientRepository.save(existingClient);
-                    })
-                    .orElseThrow(() -> new ClientNotFoundException(id));
-        }
+    @Override
+    public Client updateEntity(Client existing, Client incoming) {
+        existing.setFullName(incoming.getFullName());
+        existing.setBirthDate(incoming.getBirthDate());
+        return clientRepository.save(existing);
     }
 }

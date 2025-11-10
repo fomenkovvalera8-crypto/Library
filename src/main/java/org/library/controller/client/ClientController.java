@@ -68,7 +68,7 @@ public class ClientController {
         if (bindingResult.hasErrors()) {
             return VIEW_FORM;
         }
-        clientCRUDService.saveOrUpdate(client, null);
+        clientCRUDService.saveOrUpdate(client, null, ClientNotFoundException::new);
         return REDIRECT_CLIENT;
     }
 
@@ -100,7 +100,7 @@ public class ClientController {
             return VIEW_FORM;
         }
 
-        clientCRUDService.saveOrUpdate(client, id);
+        clientCRUDService.saveOrUpdate(client, id, ClientNotFoundException::new);
         return REDIRECT_CLIENT;
     }
 }

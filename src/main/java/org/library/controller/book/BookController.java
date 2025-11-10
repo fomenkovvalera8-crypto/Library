@@ -110,7 +110,7 @@ public class BookController {
             model.addAttribute("book", book);
             return BOOK_FORM;
         }
-        bookCRUDService.saveOrUpdate(book, id);
+        bookCRUDService.saveOrUpdate(book, id, BookNotFoundException::new);
         return REDIRECT_BOOKS;
     }
 }

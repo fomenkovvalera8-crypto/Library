@@ -77,7 +77,7 @@ public class BorrowController {
     @PostMapping
     public String addBorrow(@ModelAttribute Borrow borrow) {
         validateBorrowEntities(borrow);
-        borrowCRUDService.saveOrUpdate(borrow, null);
+        borrowCRUDService.saveOrUpdate(borrow, null,BorrowNotFoundException::new);
         return REDIRECT_BORROWS;
     }
 
@@ -108,7 +108,7 @@ public class BorrowController {
     @PostMapping("/update/{id}")
     public String updateBorrow(@PathVariable Long id, @ModelAttribute Borrow borrow) {
         validateBorrowEntities(borrow);
-        borrowCRUDService.saveOrUpdate(borrow, id);
+        borrowCRUDService.saveOrUpdate(borrow, id, BorrowNotFoundException::new);
         return REDIRECT_BORROWS;
     }
 

@@ -7,6 +7,7 @@ import org.library.repository.BookRepository;
 import org.library.service.abstraction.PaginationService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 /**
@@ -18,15 +19,8 @@ public class BookPaginationService implements PaginationService<Book> {
 
     private final BookRepository bookRepository;
 
-    /**
-     * Получает страницу книг
-     * @param page номер страницы (начиная с 0)
-     * @param size количество элементов на странице
-     * @return объект PageDTO с книгами, информацией о следующей странице и параметрами запроса
-     */
-    public PageDTO<Book> getPage(int page, int size) {
-        Page<Book> booksPage = bookRepository.findAll(PageRequest.of(page, size));
-        boolean hasMore = booksPage.hasNext();
-        return new PageDTO<>(booksPage.getContent(), hasMore, page, size);
+    @Override
+    public JpaRepository<Book, Long> getRepository() {
+        return bookRepository;
     }
 }
