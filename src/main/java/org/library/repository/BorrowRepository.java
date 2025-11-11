@@ -18,15 +18,14 @@ public interface BorrowRepository extends JpaRepository<Borrow, Long> {
      * @param pageable объект Pageable для пагинации
      * @return страница с найденными выдачами
      */
-    @Query(value = "SELECT * FROM borrow b " +
-            "LEFT JOIN client c ON b.client_id = c.id " +
-            "LEFT JOIN book bk ON b.book_id = bk.id " +
-            "WHERE LOWER(c.full_name) LIKE LOWER(CONCAT('%', :query, '%')) " +
-            "   OR TO_CHAR(c.birth_date, 'DD.MM.YYYY') LIKE CONCAT('%', :query, '%') " +
+    @Query("SELECT b FROM Borrow b " +
+            "LEFT JOIN b.client c " +
+            "LEFT JOIN b.book bk " +
+            "WHERE LOWER(c.fullName) LIKE LOWER(CONCAT('%', :query, '%')) " +
+            "   OR FUNCTION('TO_CHAR', c.birthDate, 'DD.MM.YYYY') LIKE CONCAT('%', :query, '%') " +
             "   OR LOWER(bk.title) LIKE LOWER(CONCAT('%', :query, '%')) " +
             "   OR LOWER(bk.author) LIKE LOWER(CONCAT('%', :query, '%')) " +
             "   OR LOWER(bk.isbn) LIKE LOWER(CONCAT('%', :query, '%')) " +
-            "   OR TO_CHAR(b.borrow_date, 'DD.MM.YYYY') LIKE CONCAT('%', :query, '%')",
-            nativeQuery = true)
+            "   OR FUNCTION('TO_CHAR', b.borrowDate, 'DD.MM.YYYY') LIKE CONCAT('%', :query, '%')")
     Page<Borrow> searchAllColumns(@Param("query") String query, Pageable pageable);
 }
